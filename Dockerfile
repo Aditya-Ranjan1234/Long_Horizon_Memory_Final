@@ -72,14 +72,13 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Set PYTHONPATH to include the project directory
 ENV PYTHONPATH="/app/project:$PYTHONPATH"
 
-# Ensure web UI dependencies are installed in the final stage
-RUN pip install "openenv-core[core,web]>=0.2.3" gradio jinja2 aiofiles
+# Ensure web UI dependencies are installed into the virtual environment in the final stage
+RUN /app/.venv/bin/pip install --upgrade "openenv-core[core,web]>=0.2.3" gradio jinja2 aiofiles
 
 # Health check - use 127.0.0.1 to ensure it's internal
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://127.0.0.1:7860/health || exit 1
 
-# Run the FastAPI server using python -m to avoid shebang issues with moved venvs
-# Run from the project directory so 'server.app' is findable
+# Run the FastAPI server using the venv python to ensure correct environment
 WORKDIR /app/project
-CMD ["python", "-m", "uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["/app/.venv/bin/python", "-m", "uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]

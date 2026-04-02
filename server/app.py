@@ -49,9 +49,13 @@ except (ImportError, ModuleNotFoundError):
 
 # Create the app with web interface and README integration
 try:
+    import openenv.core.env_server.web_interface as web_interface
     from openenv.core.env_server.web_interface import mount_web_interface
     HAS_WEB_INTERFACE = True
-except ImportError:
+except ImportError as e:
+    print(f"Import error for web_interface: {e}")
+    import sys
+    print(f"Python path: {sys.path}")
     HAS_WEB_INTERFACE = False
 
 print(f"HAS_WEB_INTERFACE: {HAS_WEB_INTERFACE}")
