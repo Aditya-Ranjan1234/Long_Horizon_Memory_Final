@@ -1,0 +1,1142 @@
+[
+  {
+    "episode_id": 1,
+    "conversation_domain": "education_ai",
+    "difficulty": "easy",
+    "string_relevant_messages": [
+      {
+        "text": "I am building an AI system to generate multiple-choice questions from lecture notes but many outputs are shallow.",
+        "isRelevant": true
+      },
+      {
+        "text": "The questions become repetitive across different note chunks.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want more analysis and application style questions, not pure recall.",
+        "isRelevant": true
+      },
+      {
+        "text": "I bought new running shoes and started morning jogging.",
+        "isRelevant": false
+      },
+      {
+        "text": "I need answer checking with explanations in the same pipeline.",
+        "isRelevant": true
+      },
+      {
+        "text": "Retrieved context is sometimes irrelevant or too long.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want the assistant to adapt across subjects and difficulty levels.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 2,
+    "conversation_domain": "software_debugging",
+    "difficulty": "easy",
+    "string_relevant_messages": [
+      {
+        "text": "My Python CSV processing script gets very slow for large files.",
+        "isRelevant": true
+      },
+      {
+        "text": "Memory usage spikes and occasionally crashes the process.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want to profile the code to find the exact bottleneck.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am learning watercolor painting in my free time.",
+        "isRelevant": false
+      },
+      {
+        "text": "Chunked processing might help but I need clean implementation.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am unsure whether pandas is really the main problem.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 3,
+    "conversation_domain": "career_guidance",
+    "difficulty": "medium",
+    "string_relevant_messages": [
+      {
+        "text": "I am deciding between machine learning and full-stack development.",
+        "isRelevant": true
+      },
+      {
+        "text": "I enjoy both model building and user-facing app development.",
+        "isRelevant": true
+      },
+      {
+        "text": "I have projects in both areas but limited depth in each.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want to know which path has better long-term stability.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am picking a marathon club for this semester.",
+        "isRelevant": false
+      },
+      {
+        "text": "I need a plan that keeps options open while building expertise.",
+        "isRelevant": true
+      },
+      {
+        "text": "My laptop keyboard backlight recently stopped working.",
+        "isRelevant": false
+      }
+    ]
+  },
+  {
+    "episode_id": 4,
+    "conversation_domain": "health_lifestyle",
+    "difficulty": "medium",
+    "string_relevant_messages": [
+      {
+        "text": "I sleep late because of workload and screen time.",
+        "isRelevant": true
+      },
+      {
+        "text": "Even when I go to bed early I struggle to fall asleep.",
+        "isRelevant": true
+      },
+      {
+        "text": "I cannot follow sleep hygiene consistently in college.",
+        "isRelevant": true
+      },
+      {
+        "text": "I drink caffeine and wonder how much it affects sleep.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need a sustainable routine without drastic daily changes.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am comparing cameras for landscape photography.",
+        "isRelevant": false
+      },
+      {
+        "text": "I am looking up sourdough starter maintenance tips.",
+        "isRelevant": false
+      }
+    ]
+  },
+  {
+    "episode_id": 5,
+    "conversation_domain": "ai_system_design",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "I am designing a multi-agent system with planning, execution, and validation agents.",
+        "isRelevant": true
+      },
+      {
+        "text": "Agents sometimes produce conflicting outputs and consensus is hard.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am evaluating whether to use a central orchestrator.",
+        "isRelevant": true
+      },
+      {
+        "text": "Shared memory synchronization causes redundant records.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need scalable modular architecture for agent coordination.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am repainting my apartment kitchen next week.",
+        "isRelevant": false
+      },
+      {
+        "text": "I am comparing compact mechanical keyboards for travel.",
+        "isRelevant": false
+      },
+      {
+        "text": "I need conflict resolution policies and confidence aggregation.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 6,
+    "conversation_domain": "entrepreneurship",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "I want to validate an attendance automation startup idea.",
+        "isRelevant": true
+      },
+      {
+        "text": "Privacy and transparency around location data are major concerns.",
+        "isRelevant": true
+      },
+      {
+        "text": "The product should feel seamless with minimal manual input.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need a scaling strategy for multiple institutions.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need a practical roadmap from idea to execution.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am buying a new gaming laptop this semester.",
+        "isRelevant": false
+      },
+      {
+        "text": "I am interested in fantasy football statistics this season.",
+        "isRelevant": false
+      },
+      {
+        "text": "I need compliance planning for regional privacy regulations.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 7,
+    "conversation_domain": "customer_support_ops",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Our support queue has duplicate complaints that hide urgent billing incidents.",
+        "isRelevant": true
+      },
+      {
+        "text": "We need triage rules that prioritize payment failures and account lockouts.",
+        "isRelevant": true
+      },
+      {
+        "text": "Agents need concise memory of prior customer context across channels.",
+        "isRelevant": true
+      },
+      {
+        "text": "I baked banana bread for the first time yesterday.",
+        "isRelevant": false
+      },
+      {
+        "text": "False urgency labels are causing SLA breaches for real critical tickets.",
+        "isRelevant": true
+      },
+      {
+        "text": "Escalation criteria must be deterministic for audit review.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need recommendations for budget earbuds with good bass.",
+        "isRelevant": false
+      },
+      {
+        "text": "We also need multilingual intent normalization before routing.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am planning a weekend road trip itinerary.",
+        "isRelevant": false
+      },
+      {
+        "text": "The final system should reduce first response time without hurting resolution quality.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 8,
+    "conversation_domain": "research_workflow",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "I am running a literature review agent but citation quality is inconsistent.",
+        "isRelevant": true
+      },
+      {
+        "text": "The agent confuses survey papers with primary empirical studies.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need memory slots reserved for methodology, dataset, and metrics.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am collecting retro game cartridges as a hobby.",
+        "isRelevant": false
+      },
+      {
+        "text": "Near-duplicate abstracts cause redundant summaries and wasted context window.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need deterministic ranking criteria for relevance and novelty.",
+        "isRelevant": true
+      },
+      {
+        "text": "I watched three documentaries this week.",
+        "isRelevant": false
+      },
+      {
+        "text": "The final output should support reproducible evidence tracing.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am comparing standing desks for my room.",
+        "isRelevant": false
+      },
+      {
+        "text": "I need confidence-calibrated summaries for uncertain findings.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 9,
+    "conversation_domain": "security_incident_response",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "We are simulating incident response for suspicious authentication spikes.",
+        "isRelevant": true
+      },
+      {
+        "text": "Memory should retain indicators of compromise and timeline milestones.",
+        "isRelevant": true
+      },
+      {
+        "text": "The team misses lateral movement clues when alerts are noisy.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am practicing fingerstyle guitar every evening.",
+        "isRelevant": false
+      },
+      {
+        "text": "Containment actions must be prioritized before low-risk anomalies.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need deterministic scoring for postmortem correctness and coverage.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am trying different coffee brewing methods this month.",
+        "isRelevant": false
+      },
+      {
+        "text": "Evidence provenance is critical for compliance and legal review.",
+        "isRelevant": true
+      },
+      {
+        "text": "I am updating my home theater speaker placement.",
+        "isRelevant": false
+      },
+      {
+        "text": "The final system should minimize false positives while preserving recall.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 10,
+    "conversation_domain": "data_engineering",
+    "difficulty": "easy",
+    "string_relevant_messages": [
+      {
+        "text": "My ETL pipeline is failing intermittently with timeout errors.",
+        "isRelevant": true
+      },
+      {
+        "text": "The data source API rate limits are not documented clearly.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need to implement retry logic with exponential backoff.",
+        "isRelevant": true
+      },
+      {
+        "text": "I started watching a new cooking show on Netflix.",
+        "isRelevant": false
+      },
+      {
+        "text": "Monitoring alerts should distinguish between transient and permanent failures.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want to track pipeline SLA metrics in a dashboard.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 11,
+    "conversation_domain": "mobile_app_development",
+    "difficulty": "easy",
+    "string_relevant_messages": [
+      {
+        "text": "My React Native app crashes when users upload large images.",
+        "isRelevant": true
+      },
+      {
+        "text": "Image compression before upload would help performance.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need to test on both iOS and Android devices.",
+        "isRelevant": true
+      },
+      {
+        "text": "I bought tickets for a concert next month.",
+        "isRelevant": false
+      },
+      {
+        "text": "Error logging should capture device info and memory stats.",
+        "isRelevant": true
+      },
+      {
+        "text": "Users need clear feedback when upload fails or is too large.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 12,
+    "conversation_domain": "devops_infrastructure",
+    "difficulty": "medium",
+    "string_relevant_messages": [
+      {
+        "text": "Our Kubernetes cluster has memory leaks in certain pods.",
+        "isRelevant": true
+      },
+      {
+        "text": "Auto-scaling triggers too late during traffic spikes.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need better observability into pod resource consumption.",
+        "isRelevant": true
+      },
+      {
+        "text": "Cost optimization is important without sacrificing reliability.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm thinking about adopting a rescue dog.",
+        "isRelevant": false
+      },
+      {
+        "text": "We should implement circuit breakers for external service calls.",
+        "isRelevant": true
+      },
+      {
+        "text": "My coworker recommended a new pizza place downtown.",
+        "isRelevant": false
+      }
+    ]
+  },
+  {
+    "episode_id": 13,
+    "conversation_domain": "machine_learning_ops",
+    "difficulty": "medium",
+    "string_relevant_messages": [
+      {
+        "text": "Model predictions are drifting after two weeks in production.",
+        "isRelevant": true
+      },
+      {
+        "text": "Training data distribution doesn't match current production data.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need automated monitoring for feature drift and model performance.",
+        "isRelevant": true
+      },
+      {
+        "text": "Retraining frequency needs to balance cost and accuracy.",
+        "isRelevant": true
+      },
+      {
+        "text": "Version control for models and datasets is currently messy.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm learning Spanish on a language app.",
+        "isRelevant": false
+      },
+      {
+        "text": "My neighbor is renovating their house and it's very loud.",
+        "isRelevant": false
+      }
+    ]
+  },
+  {
+    "episode_id": 14,
+    "conversation_domain": "product_analytics",
+    "difficulty": "medium",
+    "string_relevant_messages": [
+      {
+        "text": "User engagement dropped 15% after our latest UI redesign.",
+        "isRelevant": true
+      },
+      {
+        "text": "Navigation patterns show confusion around the new menu structure.",
+        "isRelevant": true
+      },
+      {
+        "text": "I want to run A/B tests to validate specific design changes.",
+        "isRelevant": true
+      },
+      {
+        "text": "Session replay analysis might reveal usability issues.",
+        "isRelevant": true
+      },
+      {
+        "text": "We need retention cohorts segmented by feature adoption.",
+        "isRelevant": true
+      },
+      {
+        "text": "I joined a book club that meets every Thursday.",
+        "isRelevant": false
+      },
+      {
+        "text": "My gym membership renewal is coming up next week.",
+        "isRelevant": false
+      }
+    ]
+  },
+  {
+    "episode_id": 15,
+    "conversation_domain": "distributed_systems",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "We're building a distributed cache with eventual consistency guarantees.",
+        "isRelevant": true
+      },
+      {
+        "text": "Network partitions cause stale reads and write conflicts.",
+        "isRelevant": true
+      },
+      {
+        "text": "Conflict resolution needs timestamp-based or CRDT approaches.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm organizing my bookshelf by color instead of genre.",
+        "isRelevant": false
+      },
+      {
+        "text": "Replication lag monitoring should trigger alerts above 500ms.",
+        "isRelevant": true
+      },
+      {
+        "text": "We need graceful degradation when consistency cannot be achieved.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm comparing noise-canceling headphones for the office.",
+        "isRelevant": false
+      },
+      {
+        "text": "Consensus protocols like Raft might be overkill for our use case.",
+        "isRelevant": true
+      },
+      {
+        "text": "My apartment lease is up for renewal in two months.",
+        "isRelevant": false
+      },
+      {
+        "text": "Testing partition tolerance requires chaos engineering practices.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 16,
+    "conversation_domain": "nlp_system_design",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Our conversational AI needs better context tracking across long dialogues.",
+        "isRelevant": true
+      },
+      {
+        "text": "Entity resolution fails when users refer to things indirectly.",
+        "isRelevant": true
+      },
+      {
+        "text": "Memory should prioritize user intent and unresolved questions.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm trying to fix my bicycle's flat tire this weekend.",
+        "isRelevant": false
+      },
+      {
+        "text": "Response generation needs to avoid hallucinating facts not in context.",
+        "isRelevant": true
+      },
+      {
+        "text": "Dialogue state tracking should handle topic shifts gracefully.",
+        "isRelevant": true
+      },
+      {
+        "text": "I subscribed to a meditation app for better focus.",
+        "isRelevant": false
+      },
+      {
+        "text": "We need confidence scores for ambiguous user queries.",
+        "isRelevant": true
+      },
+      {
+        "text": "My phone battery life has gotten worse recently.",
+        "isRelevant": false
+      },
+      {
+        "text": "Evaluation should measure coherence and factual grounding.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 17,
+    "conversation_domain": "api_design",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "We're designing a GraphQL API with complex nested query patterns.",
+        "isRelevant": true
+      },
+      {
+        "text": "Query depth limits are needed to prevent performance issues.",
+        "isRelevant": true
+      },
+      {
+        "text": "Caching strategies differ between REST and GraphQL architectures.",
+        "isRelevant": true
+      },
+      {
+        "text": "Authentication should support both API keys and OAuth flows.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm planning a hiking trip to the mountains next month.",
+        "isRelevant": false
+      },
+      {
+        "text": "Rate limiting needs to be per-user and per-endpoint granular.",
+        "isRelevant": true
+      },
+      {
+        "text": "I found a great deal on winter jackets yesterday.",
+        "isRelevant": false
+      },
+      {
+        "text": "Error responses must follow RFC 7807 problem details format.",
+        "isRelevant": true
+      },
+      {
+        "text": "My neighbor's cat keeps coming to my balcony.",
+        "isRelevant": false
+      },
+      {
+        "text": "Versioning strategy should avoid breaking existing client integrations.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 18,
+    "conversation_domain": "blockchain_development",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Smart contract gas optimization is critical for user adoption.",
+        "isRelevant": true
+      },
+      {
+        "text": "Reentrancy vulnerabilities need comprehensive audit coverage.",
+        "isRelevant": true
+      },
+      {
+        "text": "State machine design should prevent invalid state transitions.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm learning to play chess through online tutorials.",
+        "isRelevant": false
+      },
+      {
+        "text": "Upgrade patterns must preserve storage layout compatibility.",
+        "isRelevant": true
+      },
+      {
+        "text": "Testing requires mainnet fork simulation for realistic scenarios.",
+        "isRelevant": true
+      },
+      {
+        "text": "I bought new running socks with better arch support.",
+        "isRelevant": false
+      },
+      {
+        "text": "Oracle data feeds introduce centralization and trust assumptions.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm considering switching to a different streaming service.",
+        "isRelevant": false
+      },
+      {
+        "text": "Economic incentive analysis should model adversarial behavior.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 19,
+    "conversation_domain": "game_engine_optimization",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Frame drops are happening during particle rendering in complex scenes.",
+        "isRelevant": true
+      },
+      {
+        "text": "I've been playing a lot of indie games lately for inspiration.",
+        "isRelevant": false
+      },
+      {
+        "text": "The physics engine struggles with collision detection at high object counts.",
+        "isRelevant": true
+      },
+      {
+        "text": "Memory pooling for game objects needs restructuring to reduce allocations.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm really enjoying the new gaming mouse I bought last week.",
+        "isRelevant": false
+      },
+      {
+        "text": "Shader compilation times are killing our iteration speed during development.",
+        "isRelevant": true
+      },
+      {
+        "text": "Level design tools crash when importing large meshes from Blender.",
+        "isRelevant": true
+      },
+      {
+        "text": "My gaming setup finally has the RGB lighting configured perfectly.",
+        "isRelevant": false
+      },
+      {
+        "text": "Asset streaming needs predictive loading based on player movement patterns.",
+        "isRelevant": true
+      },
+      {
+        "text": "The render pipeline should support dynamic resolution scaling for performance.",
+        "isRelevant": true
+      },
+      {
+        "text": "I watched a speedrun of our game and noticed some interesting glitches.",
+        "isRelevant": false
+      },
+      {
+        "text": "GPU profiling shows texture uploads are blocking the main thread too long.",
+        "isRelevant": true
+      },
+      {
+        "text": "Network synchronization has race conditions during high-latency scenarios.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm thinking about streaming my gameplay on weekends.",
+        "isRelevant": false
+      },
+      {
+        "text": "Audio occlusion calculations need spatial hashing for better performance.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 20,
+    "conversation_domain": "sleep_quality_tracking",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "My sleep tracking app shows fragmented sleep patterns with frequent awakenings.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm sleeping late because I binge-watched a series last night.",
+        "isRelevant": false
+      },
+      {
+        "text": "Heart rate variability drops significantly during the second sleep cycle.",
+        "isRelevant": true
+      },
+      {
+        "text": "Environmental noise from traffic disrupts my REM sleep consistently.",
+        "isRelevant": true
+      },
+      {
+        "text": "I bought blackout curtains but haven't installed them yet.",
+        "isRelevant": false
+      },
+      {
+        "text": "Caffeine intake after 2 PM correlates with delayed sleep onset by 45 minutes.",
+        "isRelevant": true
+      },
+      {
+        "text": "My mattress is old and might be affecting sleep quality.",
+        "isRelevant": false
+      },
+      {
+        "text": "Sleep debt accumulation over the week isn't compensated by weekend recovery.",
+        "isRelevant": true
+      },
+      {
+        "text": "Blue light exposure from screens within 2 hours of bedtime affects melatonin.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm considering trying meditation before bed.",
+        "isRelevant": false
+      },
+      {
+        "text": "Temperature regulation issues - room too warm above 68°F impacts deep sleep.",
+        "isRelevant": true
+      },
+      {
+        "text": "Sleep efficiency metrics show only 75% actual sleep during 8 hours in bed.",
+        "isRelevant": true
+      },
+      {
+        "text": "My partner snores sometimes which wakes me up.",
+        "isRelevant": false
+      },
+      {
+        "text": "Consistency of sleep schedule matters more than total duration for recovery.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 21,
+    "conversation_domain": "compiler_development",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Type inference fails for recursive generic functions with higher-kinded types.",
+        "isRelevant": true
+      },
+      {
+        "text": "I've been reading about compiler design in my free time.",
+        "isRelevant": false
+      },
+      {
+        "text": "Dead code elimination misses opportunities in nested lambda expressions.",
+        "isRelevant": true
+      },
+      {
+        "text": "LLVM backend generates suboptimal code for our custom calling convention.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm learning Rust which has interesting compiler error messages.",
+        "isRelevant": false
+      },
+      {
+        "text": "Borrow checker needs flow-sensitive analysis for more accurate lifetime tracking.",
+        "isRelevant": true
+      },
+      {
+        "text": "Register allocation spills too frequently with our current heuristic.",
+        "isRelevant": true
+      },
+      {
+        "text": "I watched a conference talk about modern compiler optimizations.",
+        "isRelevant": false
+      },
+      {
+        "text": "Incremental compilation cache invalidation is too conservative causing rebuilds.",
+        "isRelevant": true
+      },
+      {
+        "text": "Error recovery in the parser produces confusing cascading diagnostics.",
+        "isRelevant": true
+      },
+      {
+        "text": "My IDE keeps freezing when compiling large projects.",
+        "isRelevant": false
+      },
+      {
+        "text": "Macro expansion needs hygiene to prevent variable capture bugs.",
+        "isRelevant": true
+      },
+      {
+        "text": "Constant folding should work across function boundaries for better optimization.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm thinking of contributing to an open-source compiler project.",
+        "isRelevant": false
+      },
+      {
+        "text": "Code generation for SIMD instructions requires better pattern matching.",
+        "isRelevant": true
+      },
+      {
+        "text": "Compilation speed regressed 40% after adding the new optimization pass.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 22,
+    "conversation_domain": "music_production_workflow",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "DAW crashes when loading projects with 100+ tracks and heavy plugin chains.",
+        "isRelevant": true
+      },
+      {
+        "text": "I've been listening to a lot of jazz lately for inspiration.",
+        "isRelevant": false
+      },
+      {
+        "text": "Audio buffer underruns occur at 128 samples causing pops and clicks.",
+        "isRelevant": true
+      },
+      {
+        "text": "VST plugin latency compensation is incorrect when automating bypass states.",
+        "isRelevant": true
+      },
+      {
+        "text": "I bought a new MIDI keyboard with better weighted keys.",
+        "isRelevant": false
+      },
+      {
+        "text": "Routing matrix needs visual redesign - current patch bay is confusing.",
+        "isRelevant": true
+      },
+      {
+        "text": "Bouncing stems takes 15 minutes for a 4-minute track on my machine.",
+        "isRelevant": true
+      },
+      {
+        "text": "My friend recommended some free sample packs I should check out.",
+        "isRelevant": false
+      },
+      {
+        "text": "MIDI timing quantization should have swing templates for different genres.",
+        "isRelevant": true
+      },
+      {
+        "text": "The mixing console UI doesn't scale properly on high-DPI displays.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm planning to attend a music production workshop next month.",
+        "isRelevant": false
+      },
+      {
+        "text": "Real-time spectrum analyzer causes CPU spikes during playback.",
+        "isRelevant": true
+      },
+      {
+        "text": "Automation curves need better interpolation modes for smooth transitions.",
+        "isRelevant": true
+      },
+      {
+        "text": "I've been watching YouTube tutorials on mastering techniques.",
+        "isRelevant": false
+      },
+      {
+        "text": "Project file format lacks backward compatibility breaking older sessions.",
+        "isRelevant": true
+      },
+      {
+        "text": "Sample library browser is slow when indexing 500GB+ of content.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 23,
+    "conversation_domain": "financial_fraud_detection",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Transaction velocity spikes during account takeover attempts need real-time flags.",
+        "isRelevant": true
+      },
+      {
+        "text": "I need to update my credit card for my Netflix subscription.",
+        "isRelevant": false
+      },
+      {
+        "text": "Geolocation mismatches between transaction and user login should trigger MFA.",
+        "isRelevant": true
+      },
+      {
+        "text": "False positive rate at 8% is causing legitimate users to be blocked frequently.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm worried about identity theft after the recent data breach news.",
+        "isRelevant": false
+      },
+      {
+        "text": "Graph analysis reveals synthetic identity patterns in clustered account creation.",
+        "isRelevant": true
+      },
+      {
+        "text": "Model drift detected - fraud patterns evolved after holiday shopping season.",
+        "isRelevant": true
+      },
+      {
+        "text": "I should probably freeze my credit report as a precaution.",
+        "isRelevant": false
+      },
+      {
+        "text": "Device fingerprinting shows browser automation signatures in suspicious logins.",
+        "isRelevant": true
+      },
+      {
+        "text": "Chargeback disputes need automated evidence collection from transaction logs.",
+        "isRelevant": true
+      },
+      {
+        "text": "My bank sent me a fraud alert but it was just my own purchase.",
+        "isRelevant": false
+      },
+      {
+        "text": "Behavioral biometrics like typing patterns improve authentication accuracy by 23%.",
+        "isRelevant": true
+      },
+      {
+        "text": "Rule engine needs fuzzy matching for merchant name variations to catch fraud.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm thinking about getting a credit monitoring service.",
+        "isRelevant": false
+      },
+      {
+        "text": "Real-time scoring latency must stay under 100ms for checkout flow.",
+        "isRelevant": true
+      },
+      {
+        "text": "Ensemble model combining XGBoost and neural network outperforms either alone.",
+        "isRelevant": true
+      },
+      {
+        "text": "I lost my wallet last week but luckily no fraudulent charges appeared.",
+        "isRelevant": false
+      },
+      {
+        "text": "Feature engineering from time-series transaction data improves recall by 15%.",
+        "isRelevant": true
+      }
+    ]
+  },
+  {
+    "episode_id": 24,
+    "conversation_domain": "photography_editing_pipeline",
+    "difficulty": "hard",
+    "string_relevant_messages": [
+      {
+        "text": "Batch export of RAW files crashes Lightroom when processing 1000+ images.",
+        "isRelevant": true
+      },
+      {
+        "text": "I went on a photo walk downtown and got some great shots.",
+        "isRelevant": false
+      },
+      {
+        "text": "Color grading presets don't transfer correctly between different camera models.",
+        "isRelevant": true
+      },
+      {
+        "text": "GPU acceleration for lens correction reduces processing time by 60%.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm thinking about upgrading to a full-frame camera soon.",
+        "isRelevant": false
+      },
+      {
+        "text": "Automated face detection for portrait cropping needs better edge case handling.",
+        "isRelevant": true
+      },
+      {
+        "text": "Catalog synchronization with cloud storage times out for large libraries.",
+        "isRelevant": true
+      },
+      {
+        "text": "I joined a local photography club that meets every Tuesday.",
+        "isRelevant": false
+      },
+      {
+        "text": "HDR merging algorithm produces halos around high-contrast edges.",
+        "isRelevant": true
+      },
+      {
+        "text": "Metadata preservation during export fails for IPTC copyright fields.",
+        "isRelevant": true
+      },
+      {
+        "text": "My camera's autofocus has been acting weird in low light.",
+        "isRelevant": false
+      },
+      {
+        "text": "Noise reduction at high ISO introduces artifacts in fine texture details.",
+        "isRelevant": true
+      },
+      {
+        "text": "Watermarking workflow needs templating system for client delivery variations.",
+        "isRelevant": true
+      },
+      {
+        "text": "I'm entering a photography contest with a landscape shot I took.",
+        "isRelevant": false
+      },
+      {
+        "text": "Smart preview generation should prioritize recently imported images first.",
+        "isRelevant": true
+      },
+      {
+        "text": "Tethered shooting has 2-second lag between capture and display on screen.",
+        "isRelevant": true
+      },
+      {
+        "text": "I watched a tutorial on advanced masking techniques yesterday.",
+        "isRelevant": false
+      },
+      {
+        "text": "Backup automation to NAS fails silently without error logging or notifications.",
+        "isRelevant": true
+      }
+    ]
+  }
+]

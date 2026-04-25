@@ -5,16 +5,38 @@
 # LICENSE file in the root directory of this source tree.
 
 """
-Long Horizon Memory Environment Implementation.
+Long Horizon Memory Environment (GRPO-friendly rewrite).
 
-A memory-selection environment with shaped rewards and deterministic grading.
+Compared to the original implementation, this version is engineered for
+LLM-policy training with GRPO. Major changes:
+
+- Per-step "direct credit" reward shaping. Each (action, message_relevance,
+  popped_slot_relevance) combination gets an immediate, well-separated reward
+  in roughly [-0.6, +0.6]. This breaks the original noop-collapse failure
+  mode: an "always noop" policy is now strictly worse than a smart policy
+  on every single step where the message is relevant.
+- Running recall: precision/recall are computed against
+  total_relevant_seen_so_far rather than the entire episode's relevant
+  count. This keeps the signal informative on long-horizon episodes.
+- F1 task score (smooth and bounded in [0, 1]).
+- Step decay penalty removed (the original penalized correct old memories
+  on long episodes and dominated the rest of the signal).
+- Terminal bonus proportional to final F1 score.
+- Stateless action-evaluation helper so GRPO can score a candidate action
+  on a snapshot state without mutating the env.
+- Configurable MEMORY_CAPACITY via the LONG_HORIZON_MEMORY_CAPACITY env var.
+- Backward-compatible Action / Observation schema (add / remove / noop).
 """
-import os
+
+from __future__ import annotations
+
+import copy
 import json
-from pathlib import Path
-from uuid import uuid4
+import os
 import random
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+from uuid import uuid4
 
 from openenv.core.env_server.interfaces import Environment
 from openenv.core.env_server.types import State
@@ -25,53 +47,88 @@ except (ImportError, ModuleNotFoundError):
     try:
         from ..models import LongHorizonMemoryAction, LongHorizonMemoryObservation
     except (ImportError, ModuleNotFoundError):
-        from long_horizon_memory.models import LongHorizonMemoryAction, LongHorizonMemoryObservation
+        from long_horizon_memory.models import (
+            LongHorizonMemoryAction,
+            LongHorizonMemoryObservation,
+        )
+
+
+# ─── Reward shaping table ────────────────────────────────────────────────────
+# Per-step rewards are intentionally well-separated so the policy gets a
+# strong, immediate gradient on each decision. Sums per episode stay small
+# enough to not dwarf the terminal bonus.
+REWARD_ADD_RELEVANT = 0.6
+REWARD_ADD_IRRELEVANT = -0.6
+REWARD_ADD_FULL_REJECTED = -0.05  # minor: agent should evict first instead
+REWARD_REMOVE_RELEVANT = -0.5
+REWARD_REMOVE_IRRELEVANT = 0.4
+REWARD_REMOVE_INVALID = -0.3
+REWARD_NOOP_ON_RELEVANT = -0.3
+REWARD_NOOP_ON_IRRELEVANT = 0.05
+REWARD_INVALID_OP = -0.5
+REWARD_DONE_THEN_STEP = -0.1
+TERMINAL_F1_BONUS_WEIGHT = 0.5
 
 
 class LongHorizonMemoryEnvironment(Environment):
     """
-    Environment where an agent decides what to keep in memory over long horizons.
+    Memory selection environment with shaped, GRPO-friendly rewards.
 
-    Task buckets are easy, medium, and hard and are selected via
-    LONG_HORIZON_MEMORY_TASK (easy/medium/hard/all), defaulting to all.
+    Episode flow:
+        - reset() picks a random episode (filtered by LONG_HORIZON_MEMORY_TASK).
+        - step(action) consumes the *current* message and applies the action.
+            * After the action, total_message_number advances by 1.
+        - Episode terminates when all messages have been consumed.
+
+    Action schema (unchanged):
+        operation in {"add", "remove", "noop"}
+        remove_index: int (required for "remove")
     """
 
-    # Enable concurrent WebSocket sessions.
-    # Set to True if your environment isolates state between instances.
-    # When True, multiple WebSocket clients can connect simultaneously, each
-    # getting their own environment instance (when using factory mode in app.py).
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
 
-    MEMORY_CAPACITY = 8
-    DECAY_PENALTY = 0.01  # Penalty per step of age for each memory slot
+    MEMORY_CAPACITY: int = int(os.getenv("LONG_HORIZON_MEMORY_CAPACITY", "8"))
 
-    def __init__(self):
-        """Initialize the long_horizon_memory environment."""
+    def __init__(self) -> None:
         episodes_path = Path(__file__).with_name("episodes.json")
         with episodes_path.open("r", encoding="utf-8") as f:
-            self.episodes = json.load(f)
-        self._task_name = os.getenv("LONG_HORIZON_MEMORY_TASK", "all").strip().lower() or "all"
-        seed_env = os.getenv("LONG_HORIZON_MEMORY_SEED")
-        self._seed = int(seed_env) if seed_env and seed_env.lstrip("-").isdigit() else None
-        self._rng = random.Random(self._seed)
-        episode_id_env = os.getenv("LONG_HORIZON_MEMORY_EPISODE_ID")
-        self._episode_id_override = (
-            int(episode_id_env) if episode_id_env and episode_id_env.lstrip("-").isdigit() else None
-        )
-        self._state = State(episode_id=str(uuid4()), step_count=0)
-        self._reset_count = 0
+            self.episodes: List[Dict[str, Any]] = json.load(f)
 
-        self.episode = 0
-        self.current_domain = "unknown"
-        self.current_difficulty = "easy"
+        self._task_name: str = (
+            os.getenv("LONG_HORIZON_MEMORY_TASK", "all").strip().lower() or "all"
+        )
+
+        seed_env = os.getenv("LONG_HORIZON_MEMORY_SEED")
+        self._seed: Optional[int] = (
+            int(seed_env) if seed_env and seed_env.lstrip("-").isdigit() else None
+        )
+        self._rng = random.Random(self._seed)
+
+        episode_id_env = os.getenv("LONG_HORIZON_MEMORY_EPISODE_ID")
+        self._episode_id_override: Optional[int] = (
+            int(episode_id_env)
+            if episode_id_env and episode_id_env.lstrip("-").isdigit()
+            else None
+        )
+
+        self._state = State(episode_id=str(uuid4()), step_count=0)
+        self._reset_count: int = 0
+
+        self.episode: int = 0
+        self.current_domain: str = "unknown"
+        self.current_difficulty: str = "easy"
         self.messages: List[Dict[str, Any]] = []
-        self.total_relevant_in_episode = 0
-        self.total_message_number = 0
+        self.total_relevant_in_episode: int = 0
+        self.total_relevant_seen: int = 0
+        self.total_message_number: int = 0
         self.memory: List[Dict[str, Any]] = []
         self.last_action_error: Optional[str] = None
-        self._done = False
+        self._done: bool = False
+        self._cumulative_reward: float = 0.0
+
         self._set_random_episode()
 
+    # ── episode selection ────────────────────────────────────────────────────
     def _infer_difficulty(self, episode_data: Dict[str, Any], episode_index: int) -> str:
         explicit = str(episode_data.get("difficulty", "")).strip().lower()
         if explicit in {"easy", "medium", "hard"}:
@@ -85,10 +142,8 @@ class LongHorizonMemoryEnvironment(Environment):
     def _candidate_indices_for_task(self) -> List[int]:
         if self._task_name not in {"easy", "medium", "hard", "all"}:
             self._task_name = "all"
-
         if self._task_name == "all":
             return list(range(len(self.episodes)))
-
         return [
             i
             for i, episode_data in enumerate(self.episodes)
@@ -100,25 +155,63 @@ class LongHorizonMemoryEnvironment(Environment):
         if not candidates:
             candidates = list(range(len(self.episodes)))
 
-        chosen_episode: Optional[int] = None
+        chosen: Optional[int] = None
         if self._episode_id_override is not None:
             for idx in candidates:
                 if int(self.episodes[idx].get("episode_id", idx + 1)) == self._episode_id_override:
-                    chosen_episode = idx
+                    chosen = idx
                     break
 
-        self.episode = chosen_episode if chosen_episode is not None else self._rng.choice(candidates)
+        self.episode = chosen if chosen is not None else self._rng.choice(candidates)
         episode_data = self.episodes[self.episode]
         self.current_domain = episode_data.get("conversation_domain", "unknown")
         self.current_difficulty = self._infer_difficulty(episode_data, self.episode)
         self.messages = episode_data.get("string_relevant_messages", [])
-        self.total_relevant_in_episode = sum(1 for m in self.messages if m.get("isRelevant", True))
+        self.total_relevant_in_episode = sum(
+            1 for m in self.messages if m.get("isRelevant", True)
+        )
 
         self.total_message_number = 0
+        self.total_relevant_seen = 0
         self.memory = []
         self.last_action_error = None
         self._done = len(self.messages) == 0
+        self._cumulative_reward = 0.0
 
+    # ── lightweight helpers for offline dataset construction ─────────────────
+    def reset_for_sampling(self) -> None:
+        """Reset without producing an Observation. Used by GRPO dataset builders."""
+        self._state = State(episode_id=str(uuid4()), step_count=0)
+        self._reset_count += 1
+        self._set_random_episode()
+
+    def advance_oracle_for_sampling(self, n_steps: int) -> None:
+        """Fast oracle warmup: deterministically apply the optimal action n_steps
+        times without producing observations. Optimal action = add when relevant
+        and capacity available, else noop."""
+        for _ in range(n_steps):
+            if self._done:
+                return
+            msg = self._current_message()
+            if msg is None:
+                self._done = True
+                return
+            rel = bool(msg.get("isRelevant", False))
+            if rel and len(self.memory) < self.MEMORY_CAPACITY:
+                self.memory.append(
+                    {
+                        "text": msg.get("text", ""),
+                        "isRelevant": True,
+                        "timestamp": self.total_message_number,
+                    }
+                )
+            if rel:
+                self.total_relevant_seen += 1
+            self.total_message_number += 1
+            if self.total_message_number >= len(self.messages):
+                self._done = True
+
+    # ── observation construction ─────────────────────────────────────────────
     def _current_message(self) -> Optional[Dict[str, Any]]:
         if self.total_message_number >= len(self.messages):
             return None
@@ -129,75 +222,28 @@ class LongHorizonMemoryEnvironment(Environment):
         incorrect = len(self.memory) - correct
         return {"correct": correct, "incorrect": incorrect}
 
-    def _compute_quality_metrics(self) -> Dict[str, float]:
+    def _running_metrics(self) -> Dict[str, float]:
         stats = self._memory_stats()
-        correct = stats["correct"]
-        incorrect = stats["incorrect"]
         kept = len(self.memory)
-
-        precision = correct / kept if kept > 0 else 0.0
-        recall = correct / self.total_relevant_in_episode if self.total_relevant_in_episode > 0 else 0.0
-        incorrect_rate = incorrect / kept if kept > 0 else 0.0
-        overflow = max(0, kept - min(self.total_relevant_in_episode, self.MEMORY_CAPACITY))
-        overflow_rate = overflow / self.MEMORY_CAPACITY if self.MEMORY_CAPACITY > 0 else 0.0
-
-        return {
-            "precision": precision,
-            "recall": recall,
-            "incorrect_rate": incorrect_rate,
-            "overflow_rate": overflow_rate,
-        }
+        seen = self.total_relevant_seen
+        precision = stats["correct"] / kept if kept > 0 else 1.0
+        recall = stats["correct"] / seen if seen > 0 else 1.0
+        return {"precision": precision, "recall": recall}
 
     def _task_score(self) -> float:
-        metrics = self._compute_quality_metrics()
-        score = (
-            0.6 * metrics["recall"]
-            + 0.4 * metrics["precision"]
-            - 0.25 * metrics["incorrect_rate"]
-            - 0.15 * metrics["overflow_rate"]
-        )
-        return max(0.0, min(1.0, score))
-
-    def _compute_reward(self, action_penalty: float = 0.0, terminal: bool = False) -> float:
-        metrics = self._compute_quality_metrics()
-
-        # Calculate temporal decay penalty
-        decay_penalty = 0.0
-        for slot in self.memory:
-            age = self.total_message_number - slot.get("timestamp", self.total_message_number)
-            # Apply decay to all memories, but especially punish old irrelevant ones
-            base_decay = self.DECAY_PENALTY * age
-            # Critical old memories (relevant) get reduced penalty
-            if slot.get("isRelevant", False):
-                decay_penalty += base_decay * 0.3  # 70% discount for relevant memories
-            else:
-                decay_penalty += base_decay  # Full penalty for irrelevant old memories
-
-        shaped = (
-            0.7 * metrics["recall"]
-            + 0.3 * metrics["precision"]
-            - 0.4 * metrics["incorrect_rate"]
-            - 0.2 * metrics["overflow_rate"]
-            - action_penalty
-            - decay_penalty
-        )
-
-        if terminal:
-            shaped += 0.35 * self._task_score()
-
-        return max(-1.0, min(1.0, shaped))
+        """Smooth F1 over what the agent has seen so far."""
+        if self.total_relevant_seen == 0:
+            return 0.0
+        m = self._running_metrics()
+        p, r = m["precision"], m["recall"]
+        if p + r <= 0:
+            return 0.0
+        return max(0.0, min(1.0, 2.0 * p * r / (p + r)))
 
     def _observation(self, reward: float) -> LongHorizonMemoryObservation:
         current_message = self._current_message()
         new_message = "" if current_message is None else current_message.get("text", "")
         stats = self._memory_stats()
-
-        # Calculate memory ages for metadata
-        memory_ages = [
-            self.total_message_number - m.get("timestamp", self.total_message_number)
-            for m in self.memory
-        ]
-
         return LongHorizonMemoryObservation(
             domain=self.current_domain,
             task_name=self.current_difficulty,
@@ -211,99 +257,295 @@ class LongHorizonMemoryEnvironment(Environment):
                 "episode_id": self.episodes[self.episode].get("episode_id", self.episode + 1),
                 "task": self.current_difficulty,
                 "memory_capacity": self.MEMORY_CAPACITY,
+                "memory_full": len(self.memory) >= self.MEMORY_CAPACITY,
                 "correct_in_memory": stats["correct"],
                 "incorrect_in_memory": stats["incorrect"],
                 "task_score": self._task_score(),
+                "total_relevant_seen": self.total_relevant_seen,
+                "total_relevant_in_episode": self.total_relevant_in_episode,
                 "last_action_error": self.last_action_error,
-                "memory_ages": memory_ages,
-                "avg_memory_age": sum(memory_ages) / len(memory_ages) if memory_ages else 0,
+                "cumulative_reward": self._cumulative_reward,
             },
         )
 
+    # ── core RL API ──────────────────────────────────────────────────────────
     def reset(self) -> LongHorizonMemoryObservation:
-        """
-        Reset the environment.
-
-        Returns:
-            LongHorizonMemoryObservation with a ready message
-        """
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._reset_count += 1
         self._set_random_episode()
         return self._observation(reward=0.0)
 
     def step(self, action: LongHorizonMemoryAction) -> LongHorizonMemoryObservation:  # type: ignore[override]
-        """
-        Execute one memory-management step.
-
-        Args:
-            action: operation and optional removal index
-
-        Returns:
-            LongHorizonMemoryObservation for the next timestep
-        """
         self._state.step_count += 1
         self.last_action_error = None
-        action_penalty = 0.0
 
         if self._done:
             self.last_action_error = "episode_already_done"
-            return self._observation(reward=-0.25)
+            return self._observation(reward=REWARD_DONE_THEN_STEP)
 
-        operation = action.operation
-        current_message = self._current_message()
+        # Capture pre-action snapshot we need for credit assignment.
+        msg = self._current_message()
+        msg_was_relevant = bool(msg.get("isRelevant", False)) if msg is not None else False
+        op = action.operation
 
-        if operation == "add":
-            if current_message is None:
+        # Apply the action and capture the popped slot when applicable.
+        popped_was_relevant: Optional[bool] = None
+
+        if op == "add":
+            if msg is None:
                 self.last_action_error = "no_current_message"
-                action_penalty += 0.15
             elif len(self.memory) >= self.MEMORY_CAPACITY:
                 self.last_action_error = "memory_capacity_reached"
-                action_penalty += 0.2
             else:
                 self.memory.append(
                     {
-                        "text": current_message.get("text", ""),
-                        "isRelevant": bool(current_message.get("isRelevant", True)),
+                        "text": msg.get("text", ""),
+                        "isRelevant": msg_was_relevant,
                         "timestamp": self.total_message_number,
                     }
                 )
-        elif operation == "remove":
+        elif op == "remove":
             idx = action.remove_index
             if idx is None:
                 self.last_action_error = "remove_index_required"
-                action_penalty += 0.2
             elif idx < 0 or idx >= len(self.memory):
                 self.last_action_error = "remove_index_out_of_range"
-                action_penalty += 0.2
             else:
-                self.memory.pop(idx)
-        elif operation == "noop":
+                popped = self.memory.pop(idx)
+                popped_was_relevant = bool(popped.get("isRelevant", False))
+        elif op == "noop":
             pass
         else:
             self.last_action_error = "invalid_operation"
-            action_penalty += 0.2
 
+        # Advance the cursor and update running counters.
+        if msg_was_relevant:
+            self.total_relevant_seen += 1
         self.total_message_number += 1
         if self.total_message_number >= len(self.messages):
             self._done = True
 
-        reward = self._compute_reward(action_penalty=action_penalty, terminal=self._done)
+        # Per-step shaped reward + terminal bonus.
+        reward = self._shaped_step_reward(
+            op=op,
+            msg_was_relevant=msg_was_relevant,
+            popped_was_relevant=popped_was_relevant,
+            error=self.last_action_error,
+        )
+        if self._done:
+            reward += TERMINAL_F1_BONUS_WEIGHT * self._task_score()
+
+        # Bound to a comfortable range; the per-step table already keeps it
+        # well-behaved, but clipping protects against future tweaks.
+        reward = max(-1.0, min(1.0, reward))
+        self._cumulative_reward += reward
         return self._observation(reward=reward)
 
     def close(self) -> None:
-        """Release environment resources (no-op for local in-memory env)."""
         return None
 
     @property
     def state(self) -> State:
-        """
-        Get the current environment state.
-
-        Returns:
-            Current State with episode_id and step_count
-        """
         return self._state
+
+    # ── stateless evaluation helpers (for GRPO) ──────────────────────────────
+    def snapshot(self) -> Dict[str, Any]:
+        """Return a deep-copyable snapshot of all per-episode state."""
+        return {
+            "episode": self.episode,
+            "current_domain": self.current_domain,
+            "current_difficulty": self.current_difficulty,
+            "messages": self.messages,
+            "total_relevant_in_episode": self.total_relevant_in_episode,
+            "total_relevant_seen": self.total_relevant_seen,
+            "total_message_number": self.total_message_number,
+            "memory": copy.deepcopy(self.memory),
+            "last_action_error": self.last_action_error,
+            "_done": self._done,
+            "_cumulative_reward": self._cumulative_reward,
+        }
+
+    def restore(self, snap: Dict[str, Any]) -> None:
+        """Restore per-episode state from a snapshot taken with snapshot()."""
+        self.episode = snap["episode"]
+        self.current_domain = snap["current_domain"]
+        self.current_difficulty = snap["current_difficulty"]
+        self.messages = snap["messages"]
+        self.total_relevant_in_episode = snap["total_relevant_in_episode"]
+        self.total_relevant_seen = snap["total_relevant_seen"]
+        self.total_message_number = snap["total_message_number"]
+        self.memory = copy.deepcopy(snap["memory"])
+        self.last_action_error = snap["last_action_error"]
+        self._done = snap["_done"]
+        self._cumulative_reward = snap["_cumulative_reward"]
+
+    def evaluate_action(
+        self, action: LongHorizonMemoryAction, *, lookahead: int = 0, gamma: float = 0.95
+    ) -> float:
+        """Score an action on the current state without permanently mutating it.
+
+        If ``lookahead > 0``, additionally roll out the oracle policy for
+        ``lookahead`` steps after the action and accumulate discounted reward.
+        This is what GRPO's reward function calls per candidate completion.
+        """
+        snap = self.snapshot()
+        try:
+            obs = self.step(action)
+            total = float(obs.reward)
+            if lookahead > 0:
+                discount = gamma
+                for _ in range(lookahead):
+                    if self._done:
+                        break
+                    next_obs = self.step(self._oracle_action())
+                    total += discount * float(next_obs.reward)
+                    discount *= gamma
+            return total
+        finally:
+            self.restore(snap)
+
+    def _oracle_action(self) -> LongHorizonMemoryAction:
+        """Return the policy-optimal action for the current state."""
+        msg = self._current_message()
+        if msg is None:
+            return LongHorizonMemoryAction(operation="noop")
+        rel = bool(msg.get("isRelevant", False))
+        if rel:
+            if len(self.memory) < self.MEMORY_CAPACITY:
+                return LongHorizonMemoryAction(operation="add")
+            for i, slot in enumerate(self.memory):
+                if not slot.get("isRelevant", False):
+                    return LongHorizonMemoryAction(operation="remove", remove_index=i)
+            return LongHorizonMemoryAction(operation="noop")
+        for i, slot in enumerate(self.memory):
+            if not slot.get("isRelevant", False):
+                return LongHorizonMemoryAction(operation="remove", remove_index=i)
+        return LongHorizonMemoryAction(operation="noop")
+
+    # ── reward shaping ───────────────────────────────────────────────────────
+    @staticmethod
+    def _shaped_step_reward(
+        *,
+        op: str,
+        msg_was_relevant: bool,
+        popped_was_relevant: Optional[bool],
+        error: Optional[str],
+    ) -> float:
+        if error is not None:
+            if error == "memory_capacity_reached":
+                return REWARD_ADD_FULL_REJECTED
+            if error == "no_current_message":
+                return -0.05
+            if error == "remove_index_required":
+                return REWARD_REMOVE_INVALID
+            if error == "remove_index_out_of_range":
+                return REWARD_REMOVE_INVALID
+            if error == "invalid_operation":
+                return REWARD_INVALID_OP
+            if error == "episode_already_done":
+                return REWARD_DONE_THEN_STEP
+            return -0.1
+
+        if op == "add":
+            return REWARD_ADD_RELEVANT if msg_was_relevant else REWARD_ADD_IRRELEVANT
+        if op == "remove":
+            return REWARD_REMOVE_RELEVANT if popped_was_relevant else REWARD_REMOVE_IRRELEVANT
+        if op == "noop":
+            return REWARD_NOOP_ON_RELEVANT if msg_was_relevant else REWARD_NOOP_ON_IRRELEVANT
+        return REWARD_INVALID_OP
+
+
+# ─── Stateless reward helper (GRPO-friendly) ─────────────────────────────────
+def score_action(
+    state: Dict[str, Any],
+    action: Dict[str, Any],
+    *,
+    capacity: int = LongHorizonMemoryEnvironment.MEMORY_CAPACITY,
+    include_terminal_bonus: bool = True,
+) -> Tuple[float, Dict[str, Any]]:
+    """Pure-function step scorer used by GRPO reward functions.
+
+    Parameters
+    ----------
+    state : dict with the keys
+        memory : list of {"text": str, "isRelevant": bool}
+        message : {"text": str, "isRelevant": bool} | None
+        total_relevant_seen : int
+        is_last_step : bool   (whether the terminal F1 bonus should fire)
+    action : dict with the keys
+        operation : "add" | "remove" | "noop"
+        remove_index : int | None
+    capacity : maximum memory size
+    include_terminal_bonus : whether to add the F1 bonus when is_last_step
+
+    Returns
+    -------
+    reward : float clipped to [-1, 1]
+    new_state : dict with updated memory, total_relevant_seen, error
+    """
+    op = str(action.get("operation", "noop"))
+    msg = state.get("message")
+    msg_rel = bool(msg.get("isRelevant", False)) if isinstance(msg, dict) else False
+    memory = [dict(m) for m in state.get("memory", [])]
+    total_relevant_seen = int(state.get("total_relevant_seen", 0))
+    is_last_step = bool(state.get("is_last_step", False))
+
+    error: Optional[str] = None
+    popped_rel: Optional[bool] = None
+
+    if op == "add":
+        if msg is None:
+            error = "no_current_message"
+        elif len(memory) >= capacity:
+            error = "memory_capacity_reached"
+        else:
+            memory.append({"text": msg.get("text", ""), "isRelevant": msg_rel})
+    elif op == "remove":
+        idx = action.get("remove_index")
+        if idx is None:
+            error = "remove_index_required"
+        else:
+            try:
+                idx = int(idx)
+            except (TypeError, ValueError):
+                error = "remove_index_required"
+                idx = -1
+            if error is None and (idx < 0 or idx >= len(memory)):
+                error = "remove_index_out_of_range"
+            elif error is None:
+                popped = memory.pop(idx)
+                popped_rel = bool(popped.get("isRelevant", False))
+    elif op == "noop":
+        pass
+    else:
+        error = "invalid_operation"
+
+    reward = LongHorizonMemoryEnvironment._shaped_step_reward(
+        op=op,
+        msg_was_relevant=msg_rel,
+        popped_was_relevant=popped_rel,
+        error=error,
+    )
+
+    new_relevant_seen = total_relevant_seen + (1 if msg_rel else 0)
+
+    if include_terminal_bonus and is_last_step:
+        correct = sum(1 for m in memory if m.get("isRelevant", False))
+        kept = len(memory)
+        precision = correct / kept if kept > 0 else 1.0
+        recall = correct / new_relevant_seen if new_relevant_seen > 0 else 1.0
+        if precision + recall > 0:
+            f1 = 2.0 * precision * recall / (precision + recall)
+        else:
+            f1 = 0.0
+        reward += TERMINAL_F1_BONUS_WEIGHT * f1
+
+    reward = max(-1.0, min(1.0, reward))
+    return reward, {
+        "memory": memory,
+        "total_relevant_seen": new_relevant_seen,
+        "error": error,
+    }
 
 
 if __name__ == "__main__":
