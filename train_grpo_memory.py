@@ -27,7 +27,13 @@ os.environ.setdefault("LONG_HORIZON_MEMORY_CAPACITY", "16")
 import torch
 from datasets import Dataset
 from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    LogitsProcessor,
+    LogitsProcessorList,
+)
 
 
 def _resolve_here() -> Path:
@@ -97,7 +103,21 @@ class TrainConfig:
 
     # Reward shaping knobs for diversity / exploration during GRPO.
     diversity_bonus: float = float(os.getenv("GRPO_DIVERSITY_BONUS", "0.05"))
-    diversity_penalty: float = float(os.getenv("GRPO_DIVERSITY_PENALTY", "0.05"))
+    diversity_penalty: float = float(os.getenv("GRPO_DIVERSITY_PENALTY", "0.20"))
+
+    # Logit bias on the "remove" token at generation time. The SFT model
+    # assigns ~0.5% probability to the remove operation; without this bias
+    # GRPO never sees a reward signal for remove. After temperature warp,
+    # +3.5 lifts P(remove) from ~0.5% to ~10-15%, so in a group of 4-6
+    # generations there is typically at least one remove for advantage
+    # estimation. The bias is small enough that grammar tokens elsewhere
+    # in the JSON keep dominating; parse rate stays >95% in practice.
+    remove_logit_bias: float = float(os.getenv("GRPO_REMOVE_LOGIT_BIAS", "3.5"))
+
+    # Extra reward bump when the policy correctly chooses `remove`. This
+    # accelerates the credit assignment that "remove of irrelevant slots is
+    # good", offsetting the SFT bias against ever sampling remove at all.
+    correct_remove_bonus: float = float(os.getenv("GRPO_CORRECT_REMOVE_BONUS", "0.20"))
 
     # Logging
     reward_log_file: str = os.getenv("REWARD_LOG_FILE", str(HERE / "grpo_reward_log.jsonl"))
@@ -231,15 +251,21 @@ def build_dataset(tokenizer) -> Dataset:
         env.reset()
         style = rng.choices(
             ["oracle_natural", "fill_first", "remove_friendly"],
-            weights=[0.35, 0.35, 0.30],
+            weights=[0.20, 0.35, 0.45],
             k=1,
         )[0]
         style_hist[style] += 1
 
         if style == "fill_first":
-            _force_fill_to(env, capacity, accept_irrelevant_prob=0.4, rng=rng)
+            # Force memory to capacity with a heavy mix of irrelevants so that
+            # subsequent steps are dominated by add-rejected-when-full and
+            # remove-of-irrelevant decisions (where remove is uniquely best).
+            _force_fill_to(env, capacity, accept_irrelevant_prob=0.7, rng=rng)
         elif style == "remove_friendly":
-            _force_fill_to(env, near_full, accept_irrelevant_prob=0.85, rng=rng)
+            # Pre-load 4-14 irrelevants. Now most steps are: agent sees a new
+            # message while memory holds clear noise; remove of an irrelevant
+            # slot is the highest-reward action.
+            _force_fill_to(env, near_full, accept_irrelevant_prob=0.9, rng=rng)
 
         steps_in_ep = 0
         max_steps = max(8, CFG.rollouts_per_episode * 8)
@@ -482,9 +508,18 @@ def combined_reward_fn(completions, **kwargs) -> List[float]:
             except Exception:
                 task_r = -1.0
 
+        # Explicit "correct remove" bonus. When the policy rolls a `remove`
+        # that the env scored positively (REWARD_REMOVE_IRRELEVANT == +0.4),
+        # we add an extra bonus so the gradient toward `remove` is at least
+        # as large as the gradient toward `add` on a relevant message. This
+        # offsets the SFT bias against the remove token.
+        remove_bonus = 0.0
+        if action is not None and action.operation == "remove" and task_r > 0.0:
+            remove_bonus = CFG.correct_remove_bonus
+
         fmt_r = 0.05 if action is not None else -0.1
         div_r = diversity_reward[i]
-        total_r = float(task_r + fmt_r + div_r)
+        total_r = float(task_r + fmt_r + div_r + remove_bonus)
         rewards.append(total_r)
 
         prompt_text = None
@@ -496,7 +531,7 @@ def combined_reward_fn(completions, **kwargs) -> List[float]:
             completion_text=completion_text,
             parse_status=status,
             action_obj=action,
-            task_reward=task_r,
+            task_reward=task_r + remove_bonus,
             format_reward=fmt_r + div_r,
             total_reward=total_r,
             prompt_text=prompt_text,
@@ -504,6 +539,85 @@ def combined_reward_fn(completions, **kwargs) -> List[float]:
 
     REWARD_MONITOR.maybe_print_summary()
     return rewards
+
+
+class _AdditiveTokenLogitBias(LogitsProcessor):
+    """Add a small additive bias to a fixed set of token ids during generation.
+
+    This is the exploration mechanism that lets GRPO discover the `remove`
+    operation. Without it, the SFT policy assigns ~1e-3 probability to the
+    `remove` token, so even at temperature 1.3 it is sampled roughly never;
+    GRPO can only learn from actions that get sampled at least sometimes.
+    """
+
+    def __init__(self, token_ids: List[int], bias: float):
+        super().__init__()
+        self.token_ids = list(token_ids)
+        self.bias = float(bias)
+
+    def __call__(self, input_ids, scores):
+        if not self.token_ids or self.bias == 0.0:
+            return scores
+        scores[:, self.token_ids] = scores[:, self.token_ids] + self.bias
+        return scores
+
+
+def _resolve_remove_token_ids(tokenizer) -> List[int]:
+    """Find the token ids that BPE produces for the word ``remove`` in JSON.
+
+    JSON action output is shaped like ``{"operation":"remove",...}``. After the
+    quote, BPE typically encodes ``remove`` as a single token; we also try a
+    few neighboring contexts (leading space, leading quote) in case the model
+    sometimes emits them.
+    """
+    candidates: List[str] = ["remove", " remove", '"remove']
+    out: List[int] = []
+    seen = set()
+    for cand in candidates:
+        try:
+            ids = tokenizer.encode(cand, add_special_tokens=False)
+        except Exception:
+            continue
+        if not ids:
+            continue
+        for tok_id in ids:
+            try:
+                decoded = tokenizer.decode([tok_id]).strip().strip('"').lower()
+            except Exception:
+                decoded = ""
+            if decoded.startswith("remov") and tok_id not in seen:
+                out.append(tok_id)
+                seen.add(tok_id)
+    return out
+
+
+def _attach_remove_logit_bias(model, tokenizer, bias: float) -> List[int]:
+    """Monkey-patch ``model.generate`` to always include the remove-bias
+    processor. Returns the list of biased token ids for logging."""
+    if bias == 0.0:
+        return []
+    token_ids = _resolve_remove_token_ids(tokenizer)
+    if not token_ids:
+        print("[grpo] WARNING: could not resolve `remove` token ids; skipping logit bias")
+        return []
+
+    processor = _AdditiveTokenLogitBias(token_ids=token_ids, bias=bias)
+
+    original_generate = model.generate
+
+    def biased_generate(*args, **kwargs):
+        existing = kwargs.get("logits_processor")
+        if existing is None:
+            kwargs["logits_processor"] = LogitsProcessorList([processor])
+        else:
+            existing_list = list(existing)
+            if processor not in existing_list:
+                existing_list.append(processor)
+            kwargs["logits_processor"] = LogitsProcessorList(existing_list)
+        return original_generate(*args, **kwargs)
+
+    model.generate = biased_generate  # type: ignore[assignment]
+    return token_ids
 
 
 def load_model_and_tokenizer():
@@ -562,6 +676,13 @@ def main() -> None:
         )
 
         model, tokenizer = load_model_and_tokenizer()
+
+        biased_ids = _attach_remove_logit_bias(model, tokenizer, CFG.remove_logit_bias)
+        if biased_ids:
+            print(
+                f"[grpo] Logit-biasing remove token ids {biased_ids} "
+                f"by +{CFG.remove_logit_bias} (enables exploration of the remove op)"
+            )
 
         print(f"[grpo] Building dataset of {CFG.dataset_size} states from {CFG.episodes_file}")
         dataset = build_dataset(tokenizer)
