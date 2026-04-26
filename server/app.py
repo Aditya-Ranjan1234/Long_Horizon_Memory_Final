@@ -149,6 +149,10 @@ if os.path.exists(ui_dist_path):
     app.router.routes.clear()
     app.router.routes.extend(new_routes)
     app.mount("/web", StaticFiles(directory=ui_dist_path, html=True), name="custom_web")
+    
+    @app.get("/web")
+    async def web_redirect():
+        return RedirectResponse(url="/web/")
 else:
     print(f"[SERVER] No custom UI found at {ui_dist_path}, using default.")
 
@@ -181,7 +185,7 @@ async def health_check():
 @app.get("/")
 async def root_redirect():
     from fastapi.responses import RedirectResponse
-    return RedirectResponse(url="/web")
+    return RedirectResponse(url="/web/")
 
 
 @app.get("/routes")

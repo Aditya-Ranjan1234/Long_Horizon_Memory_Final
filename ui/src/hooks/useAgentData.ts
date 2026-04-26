@@ -130,19 +130,13 @@ export const useAgentData = () => {
       // In production deploys we consume the HF stream directly.
       // Local development can still use the local backend proxy.
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const hostname = window.location.hostname;
-      const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
-      const hfWsUrl = "wss://aditya-ranjan1234-long-horizon-memory-env-final.hf.space/ws/monitor";
+      const wsUrl = `${protocol}//${window.location.host}/ws/monitor`;
       
-      const wsUrl = isLocalDev
-        ? `${protocol}//${window.location.host}/api/ws/monitor`
-        : hfWsUrl;
-      
-      console.log(`[WS] Attempting connection to: ${wsUrl}`);
+      console.log(`[WS] Connecting to: ${wsUrl}`);
       ws.current = new WebSocket(wsUrl);
 
       ws.current.onopen = () => {
-        console.log(`[WS] Connected to ${isLocalDev ? 'Agent Backend' : 'HF Space'}`);
+        console.log(`[WS] Connected successfully to ${wsUrl}`);
         setConnected(true);
       };
 
