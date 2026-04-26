@@ -1,0 +1,45 @@
+name: Deploy to HF Spaces
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Deploy to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+        run: |
+          git config --global user.email "aditya87331@gmail.com"
+          git config --global user.name "Aditya-Ranjan1234"
+
+          # Use a shallow clone for speed, but ensure we have enough history
+          git clone --depth 1 https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final hf-space
+          
+          # Exclude .git, and other non-backend files
+          rsync -av --delete \
+            --exclude='.git' \
+            --exclude='.github/' \
+            --exclude='README.md' \
+            ./ hf-space/
+
+          cd hf-space
+          
+          git add .
+          git commit -m "Auto deploy from GitHub" || echo "No changes"
+          git push https://aditya-ranjan1234:$HF_TOKEN@huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final main

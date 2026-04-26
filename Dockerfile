@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Set the virtual environment path
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH="/app:$PYTHONPATH"
+ENV ENABLE_WEB_INTERFACE=true
 
 # Ensure web UI dependencies are explicitly available
 RUN pip install --upgrade "openenv-core[core,web]>=0.2.3" gradio jinja2 aiofiles
@@ -35,6 +36,6 @@ RUN pip install --upgrade "openenv-core[core,web]>=0.2.3" gradio jinja2 aiofiles
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://127.0.0.1:7860/health || exit 1
 
-# Run the FastAPI server directly from the root
+# Run the app directly from the root for Hugging Face Spaces compatibility
 # Using the venv's python to ensure all dependencies are found
-CMD ["python", "-m", "uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "app.py"]
