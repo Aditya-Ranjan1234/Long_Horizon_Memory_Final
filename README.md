@@ -433,6 +433,20 @@ Our GRPO-based training shows consistent convergence across complex semantic dis
 - **Mean Recall:** 0.94
 - **Mean Precision:** 0.88
 
+### Detailed Metrics
+The following visualizations provide a deep dive into the model's decision-making process and score distribution.
+
+| Metric | Visualization |
+|--------|---------------|
+| **Recall & Precision** | ![Precision Recall](images/precision_recall.png) |
+| **F1 Scores** | ![F1 Scores](images/f1_scores.png) |
+| **Action Distribution** | ![Action Distribution](images/action_distribution.png) |
+
+### Benchmark Comparison
+Our optimized GRPO policy significantly outperforms the base model and SFT baselines across all difficulty tiers.
+
+![Benchmark Table](images/benchmark_table.png)
+
 ### Deployment Configuration
 The environment is optimized for high-throughput inference on Hugging Face Spaces.
 
