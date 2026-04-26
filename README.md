@@ -116,6 +116,27 @@ During training, immediate feedback is provided to guide the policy:
 
 The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
+### Benchmark Summary
+<div align="center">
+
+![Benchmark Summary](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_summary.png)
+
+</div>
+
+### Benchmark Metrics
+<div align="center">
+
+![Benchmark Metrics](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_metrics.png)
+
+</div>
+
+### Action Distribution Comparison
+<div align="center">
+
+![Action Distribution Comparison](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/action_distribution_comparison.png)
+
+</div>
+
 ### Mean Reward Per Step
 <div align="center">
 
