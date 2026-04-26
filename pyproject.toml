@@ -14,7 +14,7 @@ version = "0.1.0"
 description = "Long Horizon Memory environment for OpenEnv"
 requires-python = ">=3.10"
 dependencies = [
-    "openenv-core[core,web]>=0.2.3",
+    "openenv-core>=0.2.3",
     "openai>=1.30.0",
     "jinja2",
     "aiofiles",

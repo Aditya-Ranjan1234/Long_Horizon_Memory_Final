@@ -106,14 +106,17 @@ manager = ConnectionManager()
 def get_monitored_env_class(manager):
     class MonitoredEnv(LongHorizonMemoryEnvironment):
         def _broadcast(self, obs, action=None):
-            data = obs.model_dump() if hasattr(obs, "model_dump") else obs.dict()
-            if action:
-                data["operation"] = action.operation
-            else:
-                data["operation"] = "reset"
-            
-            # Use call_soon_threadsafe or just put in queue if we are in same thread
-            asyncio.run_coroutine_threadsafe(manager.broadcast_queue.put(data), asyncio.get_event_loop())
+            try:
+                data = obs.model_dump() if hasattr(obs, "model_dump") else obs.dict()
+                if action:
+                    data["operation"] = action.operation
+                else:
+                    data["operation"] = "reset"
+                
+                # Non-blocking put into the async queue
+                manager.broadcast_queue.put_nowait(data)
+            except Exception as e:
+                print(f"[SERVER] Broadcast error: {e}")
 
         def step(self, action: LongHorizonMemoryAction) -> LongHorizonMemoryObservation:
             obs = super().step(action)
