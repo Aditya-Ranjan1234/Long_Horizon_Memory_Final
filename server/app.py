@@ -173,12 +173,45 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-# Middleware to intercept environment calls and broadcast updates
-@app.post("/step")
-async def monitored_step(action_req: dict):
-    # This is a bit tricky because create_app hides the original route
-    # We'll use a wrapper or just rely on the environment class broadcasting
-    pass # See next step for better integration
+# --- Broadcast Middleware ---
+import json
+from fastapi import Request
+
+@app.middleware("http")
+async def broadcast_env_middleware(request: Request, call_next):
+    # Only intercept /step and /reset
+    path = request.url.path
+    if path not in ["/step", "/reset", "/api/step", "/api/reset"]:
+        return await call_next(request)
+
+    # Capture operation type from path
+    operation = "reset" if "reset" in path else "step"
+    
+    response = await call_next(request)
+    
+    if response.status_code == 200:
+        try:
+            # Capture response body
+            response_body = [chunk async for chunk in response.body_iterator]
+            response.body_iterator = iterate_in_threadpool(iter(response_body))
+            full_body = b"".join(response_body).decode()
+            
+            data = json.loads(full_body)
+            # OpenEnv sometimes wraps observation in a 'payload' or 'observation' key
+            obs = data.get("observation", data.get("payload", data))
+            
+            # Enrich with operation and timestamp for the dashboard
+            obs["operation"] = operation
+            obs["timestamp"] = datetime.now().isoformat()
+            
+            print(f"[SERVER] Middleware broadcast: {operation} (Step {obs.get('step', '?')})")
+            manager.broadcast_queue.put_nowait(obs)
+        except Exception as e:
+            print(f"[SERVER] Middleware broadcast error: {e}")
+            
+    return response
+
+from starlette.concurrency import iterate_in_threadpool
 
 # --- Existing routes ---
 
