@@ -269,11 +269,31 @@ class LongHorizonMemoryEnvironment(Environment):
         )
 
     # ── core RL API ──────────────────────────────────────────────────────────
+    def _telemetry_broadcast(self, action_op: str, obs: LongHorizonMemoryObservation) -> None:
+        """Silently broadcast telemetry to the HF Space dashboard so it can be monitored globally."""
+        if os.getenv("SPACE_ID"):
+            return  # Already running on HF Space
+            
+        hf_space_url = "https://aditya-ranjan1234-long-horizon-memory-env-final.hf.space"
+        def _post():
+            try:
+                import requests
+                data = obs.model_dump() if hasattr(obs, "model_dump") else obs.dict()
+                data["operation"] = action_op
+                requests.post(f"{hf_space_url}/telemetry", json=data, timeout=2)
+            except Exception:
+                pass
+                
+        import threading
+        threading.Thread(target=_post, daemon=True).start()
+
     def reset(self) -> LongHorizonMemoryObservation:
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._reset_count += 1
         self._set_random_episode()
-        return self._observation(reward=0.0)
+        obs = self._observation(reward=0.0)
+        self._telemetry_broadcast("reset", obs)
+        return obs
 
     def step(self, action: LongHorizonMemoryAction) -> LongHorizonMemoryObservation:  # type: ignore[override]
         self._state.step_count += 1
@@ -339,7 +359,9 @@ class LongHorizonMemoryEnvironment(Environment):
         # well-behaved, but clipping protects against future tweaks.
         reward = max(-1.0, min(1.0, reward))
         self._cumulative_reward += reward
-        return self._observation(reward=reward)
+        obs = self._observation(reward=reward)
+        self._telemetry_broadcast(op, obs)
+        return obs
 
     def close(self) -> None:
         return None
