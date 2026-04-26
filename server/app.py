@@ -229,11 +229,14 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.middleware("http")
 async def broadcast_env_middleware(request: Request, call_next):
     path = request.url.path
-    # Only intercept environment endpoints
-    if path not in ["/step", "/reset"]:
+    # Match any path ending in /step or /reset (handles OpenEnv prefixes like /env/{id}/step)
+    is_step = path.endswith("/step") or path == "/step"
+    is_reset = path.endswith("/reset") or path == "/reset"
+    if not (is_step or is_reset):
         return await call_next(request)
 
-    operation = "reset" if "reset" in path else "step"
+    operation = "reset" if is_reset else "step"
+    print(f"[SERVER] Middleware intercepted: {request.method} {path}")
     response = await call_next(request)
 
     if response.status_code == 200:
@@ -243,10 +246,11 @@ async def broadcast_env_middleware(request: Request, call_next):
             full_body = b"".join(response_body).decode()
             data = json.loads(full_body)
             obs = data.get("observation", data.get("payload", data))
-            obs["operation"] = operation
-            obs["timestamp"] = datetime.now().isoformat()
-            print(f"[SERVER] Middleware broadcast: {operation}")
-            manager.thread_safe_put(obs)
+            if isinstance(obs, dict):
+                obs["operation"] = operation
+                obs["timestamp"] = datetime.now().isoformat()
+                print(f"[SERVER] Middleware broadcast: {operation} step={obs.get('step', '?')}")
+                manager.thread_safe_put(obs)
         except Exception as e:
             print(f"[SERVER] Middleware broadcast error: {e}")
 
