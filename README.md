@@ -1,3 +1,12 @@
+---
+title: Long Horizon Memory Final
+emoji: 🧠
+colorFrom: yellow
+colorTo: black
+sdk: docker
+pinned: false
+---
+
 # 🧠 Long Horizon Memory Final
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&style=flat-square)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final)
