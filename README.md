@@ -32,11 +32,15 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 - **Method**: LoRA (4-bit quantization)
 - **Data**: ~175 samples of perfect memory management.
 
+![SFT Loss Curve](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_loss_curve.png)
+*SFT Training Log Reference:*
 ![SFT Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_training_log.jpg)
 
 ### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
 Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance.
 
+![GRPO Loss Curve](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_loss_curve.png)
+*GRPO Training Log Reference:*
 ![GRPO Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_training_log.png)
 
 #### ⚖️ Reward Function Logic
@@ -54,6 +58,13 @@ The policy is optimized using a multi-objective reward function:
 
 The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
+### Performance Comparison
+![Benchmark Metrics](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_metrics.png)
+
+### Action Selection Evolution
+![Action Distribution Comparison](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/action_distribution_comparison.png)
+
+### Benchmark Summary Data
 ![Benchmark Summary](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_summary.png)
 
 ---
