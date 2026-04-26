@@ -43,6 +43,11 @@ jobs:
 
           cd ../hf-space
           
+          # Rename README.md to Blog.md for the HF Space as requested
+          if [ -f README.md ]; then
+            mv README.md Blog.md
+          fi
+          
           echo "Deployment size:"
           du -sh .
           

@@ -82,8 +82,8 @@ function App() {
   }, [agentState]);
 
   return (
-    <div style={{ background: C.bg, color: C.text, minHeight: '100vh', fontFamily: "'Roboto Mono', monospace" }}
-      className="flex flex-col">
+    <div style={{ background: C.bg, color: C.text, fontFamily: "'Roboto Mono', monospace" }}
+      className="flex flex-col h-screen overflow-y-auto w-full">
 
       {/* ── NAV ── */}
       <nav style={{ background: C.subBg, borderBottom: `1px solid ${C.border}` }}
