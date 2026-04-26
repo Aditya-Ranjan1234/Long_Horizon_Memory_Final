@@ -274,9 +274,10 @@ async def root_redirect():
 async def receive_telemetry(payload: dict):
     """Receive telemetry from external agents running the environment locally."""
     try:
-        manager.broadcast_queue.put(payload)
+        manager.thread_safe_put(payload)
         return {"status": "ok"}
     except Exception as e:
+        print(f"[SERVER] Telemetry Error: {e}")
         return {"status": "error", "message": str(e)}
 
 
