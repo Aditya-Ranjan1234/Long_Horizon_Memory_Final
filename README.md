@@ -11,8 +11,25 @@ pinned: false
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&style=flat-square)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final)
 [![Hugging Face Space](https://img.shields.io/badge/HF%20Space-Hosted%20Env-yellow?logo=huggingface&style=flat-square)](https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final)
 [![Training Notebook](https://img.shields.io/badge/Notebook-Training%20Pipeline-blue?logo=jupyter&style=flat-square)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/complete_SFT_GRPO.ipynb)
+[![Full Training Script](https://img.shields.io/badge/Colab-Full%20Training%20Script-orange?logo=googlecolab&style=flat-square)](https://colab.research.google.com/drive/1IWAyAtn565JfX7vCLqyCaiW8a2dt-0cv?usp=sharing)
 
 A professional-grade Reinforcement Learning environment and training pipeline for evaluating long-horizon memory management in LLM agents. This project leverages **Supervised Fine-Tuning (SFT)** and **Group Relative Policy Optimization (GRPO)** to teach agents how to efficiently manage a constrained memory buffer over thousands of tokens.
+
+---
+
+## Links
+
+- **GitHub Repository**: [Aditya-Ranjan1234/Long_Horizon_Memory_Final](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final)
+- **Hugging Face Space**: [Live Dashboard Environment](https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final)
+- **Full Training Script**: [Google Colab Notebook](https://colab.research.google.com/drive/1IWAyAtn565JfX7vCLqyCaiW8a2dt-0cv?usp=sharing)
+
+<div align="center">
+
+![Live Dashboard Environment](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/hosted_hugging_face_space.png)
+<br>
+*Live dashboard on Hugging Face*
+
+</div>
 
 ---
 
