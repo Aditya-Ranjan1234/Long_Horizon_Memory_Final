@@ -32,8 +32,12 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 - **Method**: LoRA (4-bit quantization)
 - **Data**: ~175 samples of perfect memory management.
 
+![SFT Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_training_log.jpg)
+
 ### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
-Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance. GRPO compares a group of completions against each other to calculate advantages without a separate value function.
+Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance.
+
+![GRPO Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_training_log.png)
 
 #### ⚖️ Reward Function Logic
 The policy is optimized using a multi-objective reward function:
@@ -43,30 +47,22 @@ The policy is optimized using a multi-objective reward function:
   - Correct Noop: `+0.05`
   - Errors: `-0.5` to `-1.0`
 - **Format Reward**: `+0.05` for valid, parseable JSON output.
-- **Diversity Bonus**: Encourages the model to explore different operations within a group.
-- **Correct Remove Bonus**: An additional `+0.20` to encourage active buffer cleaning.
 
 ---
 
 ## 📊 Results & Benchmarks
 
-The following results demonstrate the agent's ability to maintain high precision even as the memory buffer fills up.
+The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
-### Precision & Recall
-![Precision Recall](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/precision_recall.png)
+![Benchmark Summary](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_summary.png)
 
-### F1-Score Evolution
-![F1 Scores](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/f1_scores.png)
+---
 
-### Action Frequencies
-The agent learns a balanced distribution of `add` and `remove` operations, moving away from a "noop-only" collapse.
-![Action Distribution](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/action_distribution.png)
+## 📂 Logs & Traceability
 
-### Training Reward Evolution
-![Training Results](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/training_results.png)
-
-### Benchmark Summary
-![Benchmark Table](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_table.png)
+Detailed execution logs for both training phases are available for audit:
+- [📜 GRPO Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt)
+- [📜 SFT Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/SFT%20Training%20For%20JSON%20Format.txt)
 
 ---
 

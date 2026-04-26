@@ -1,0 +1,30 @@
+SFT Training For JSON Format
+
+[SFT] Loading tokenizer: Qwen/Qwen2.5-1.5B-Instruct
+Map (num_proc=1): 100%
+ 175/175 [00:02<00:00, 113.07 examples/s]
+[SFT] Training samples: 175
+[SFT] Loading 4-bit base model + LoRA adapters...
+Loading weights: 100%
+ 338/338 [00:01<00:00, 497.79it/s, Materializing param=model.norm.weight]
+[SFT] Starting training...
+ [175/175 03:06, Epoch 1/1]
+Step	Training Loss
+10	3.400549
+20	1.920982
+30	1.087881
+40	0.999781
+50	0.706775
+60	0.820002
+70	0.684819
+80	0.439621
+90	0.267266
+100	0.308504
+110	0.417033
+120	0.319250
+130	0.271720
+140	0.170409
+150	0.198706
+160	0.227472
+170	0.197692
+[SFT] Saved adapter and tokenizer to: ./memory_action_sft_qwen15b
