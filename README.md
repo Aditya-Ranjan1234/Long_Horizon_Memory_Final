@@ -1,13 +1,13 @@
 ---
 title: Long Horizon Memory Final
-emoji: 🧠
+emoji: 🚀
 colorFrom: yellow
-colorTo: black
+colorTo: gray
 sdk: docker
 pinned: false
 ---
 
-# 🧠 Long Horizon Memory Final
+# Long Horizon Memory Final
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?logo=github&style=flat-square)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final)
 [![Hugging Face Space](https://img.shields.io/badge/HF%20Space-Hosted%20Env-yellow?logo=huggingface&style=flat-square)](https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final)
