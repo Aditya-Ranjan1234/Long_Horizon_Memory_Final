@@ -43,9 +43,10 @@ jobs:
 
           cd ../hf-space
           
-          # Rename README.md to Blog.md for the HF Space as requested
+          # Copy README.md to Blog.md instead of renaming it
+          # Hugging Face Spaces absolutely require README.md to exist for configuration!
           if [ -f README.md ]; then
-            mv README.md Blog.md
+            cp README.md Blog.md
           fi
           
           echo "Deployment size:"
