@@ -110,8 +110,10 @@ def get_monitored_env_class(manager):
                 data = obs.model_dump() if hasattr(obs, "model_dump") else obs.dict()
                 if action:
                     data["operation"] = action.operation
+                    print(f"[SERVER] Broadcasting step: {action.operation}")
                 else:
                     data["operation"] = "reset"
+                    print(f"[SERVER] Broadcasting reset")
                 
                 # Non-blocking put into the async queue
                 manager.broadcast_queue.put_nowait(data)
@@ -119,11 +121,13 @@ def get_monitored_env_class(manager):
                 print(f"[SERVER] Broadcast error: {e}")
 
         def step(self, action: LongHorizonMemoryAction) -> LongHorizonMemoryObservation:
+            print(f"[SERVER] Environment step action: {action.operation}")
             obs = super().step(action)
             self._broadcast(obs, action)
             return obs
 
         def reset(self) -> LongHorizonMemoryObservation:
+            print("[SERVER] Environment reset")
             obs = super().reset()
             self._broadcast(obs)
             return obs
