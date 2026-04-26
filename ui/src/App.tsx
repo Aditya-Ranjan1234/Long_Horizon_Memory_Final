@@ -151,7 +151,7 @@ function App() {
           
           {/* Main Visualizer */}
           <div className="lg:col-span-8 flex flex-col gap-4">
-            <div className="bg-[#0a0a0a] border border-[#1e293b] rounded-2xl p-6 relative overflow-hidden shadow-2xl group min-h-[400px]">
+            <div className="bg-[#0a0a0a] border border-[#1e293b] rounded-2xl p-6 relative overflow-hidden shadow-2xl group min-h-[400px] flex flex-col">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#facc15] to-transparent opacity-30" />
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
@@ -164,9 +164,9 @@ function App() {
                 </div>
               </div>
               
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-                  <AreaChart data={chartData}>
+              <div className="flex-1 w-full min-h-[250px] relative">
+                <ResponsiveContainer width="99%" height={300} minWidth={100} minHeight={200}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="rewardGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#facc15" stopOpacity={0.3}/>

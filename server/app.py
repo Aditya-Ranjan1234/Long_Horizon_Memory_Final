@@ -133,8 +133,10 @@ def get_monitored_env_class(manager):
             return obs
     return MonitoredEnv
 
+env_cls = get_monitored_env_class(manager)
+print(f"[SERVER] Initializing OpenEnv with monitored class: {env_cls.__name__}")
 app = create_app(
-    get_monitored_env_class(manager),
+    env_cls,
     LongHorizonMemoryAction,
     LongHorizonMemoryObservation,
     env_name="long_horizon_memory",
