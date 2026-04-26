@@ -1,0 +1,49 @@
+{
+  "config": {
+    "n_episodes": 2,
+    "seed": 20260427,
+    "max_new_tokens": 32,
+    "batch_size": 2,
+    "batch_size_7b": 2,
+    "episodes_file": "episodes_grpo_long.json",
+    "capacity": 16,
+    "skip_models": [
+      "base_7b"
+    ],
+    "only_models": [],
+    "output_root": "C:\\Users\\dipta\\Downloads\\projects\\meta_pytorch_challenge\\Long_Horizon_Memory\\benchmark_results",
+    "run_id": "run_20260426_091458"
+  },
+  "summaries": [
+    {
+      "model": "base_1.5b",
+      "n_episodes": 2,
+      "n_steps": 136,
+      "parse_rate": 1.0,
+      "parse_status": {
+        "ok": 136
+      },
+      "action_dist": {
+        "add": 0.875,
+        "remove": 0.125,
+        "noop": 0.0
+      },
+      "remove_correctness": 0.7058823529411765,
+      "remove_correct_count": 12,
+      "remove_wrong_count": 5,
+      "env_errors": {
+        "memory_capacity_reached": 71
+      },
+      "mean_step_reward": -0.1407154528478058,
+      "median_step_reward": -0.05,
+      "mean_final_f1": 0.11269841269841271,
+      "median_final_f1": 0.11269841269841271,
+      "mean_final_precision": 0.12916666666666665,
+      "mean_final_recall": 0.1,
+      "mean_max_memory_fill": 16.0,
+      "long_horizon_step_pct": 0.8382352941176471,
+      "memory_full_step_pct": 0.5882352941176471
+    }
+  ],
+  "head_to_head": {}
+}

@@ -1,0 +1,31 @@
+{
+  "model": "sft_1.5b",
+  "n_episodes": 20,
+  "n_steps": 1768,
+  "parse_rate": 0.9932126696832579,
+  "parse_status": {
+    "ok": 1756,
+    "json_invalid": 4,
+    "pydantic_invalid": 8
+  },
+  "action_dist": {
+    "add": 0.7635746606334841,
+    "remove": 0.003959276018099547,
+    "noop": 0.2324660633484163
+  },
+  "remove_correctness": 0.5714285714285714,
+  "remove_correct_count": 4,
+  "remove_wrong_count": 3,
+  "env_errors": {
+    "memory_capacity_reached": 1023
+  },
+  "mean_step_reward": -0.06497611865258811,
+  "median_step_reward": -0.05,
+  "mean_final_f1": 0.24722222222222223,
+  "median_final_f1": 0.25,
+  "mean_final_precision": 0.278125,
+  "mean_final_recall": 0.2225,
+  "mean_max_memory_fill": 16.0,
+  "long_horizon_step_pct": 0.8557692307692307,
+  "memory_full_step_pct": 0.7358597285067874
+}

@@ -1,0 +1,29 @@
+{
+  "model": "base_1.5b",
+  "n_episodes": 20,
+  "n_steps": 1768,
+  "parse_rate": 1.0,
+  "parse_status": {
+    "ok": 1768
+  },
+  "action_dist": {
+    "add": 0.9671945701357466,
+    "remove": 0.032805429864253395,
+    "noop": 0.0
+  },
+  "remove_correctness": 0.5517241379310345,
+  "remove_correct_count": 32,
+  "remove_wrong_count": 26,
+  "env_errors": {
+    "memory_capacity_reached": 1333
+  },
+  "mean_step_reward": -0.1140769769446304,
+  "median_step_reward": -0.05,
+  "mean_final_f1": 0.13619047619047617,
+  "median_final_f1": 0.11111111111111112,
+  "mean_final_precision": 0.15333333333333335,
+  "mean_final_recall": 0.12250000000000001,
+  "mean_max_memory_fill": 16.0,
+  "long_horizon_step_pct": 0.9061085972850679,
+  "memory_full_step_pct": 0.7822398190045249
+}

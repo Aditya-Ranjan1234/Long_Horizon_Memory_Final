@@ -1,0 +1,19 @@
+------------------------------
+                     base_1.5b
+------------------------------
+model                base_1.5b
+n_eps                        2
+n_steps                    136
+parse_ok %               100.0
+add %                     87.5
+remove %                  12.5
+noop %                     0.0
+rem-correct %             70.6
+mean step rwd           -0.141
+mean final F1            0.113
+mean precision           0.129
+mean recall              0.100
+mean max fill             16.0
+long-horiz %              83.8
+mem-full %                58.8
+------------------------------

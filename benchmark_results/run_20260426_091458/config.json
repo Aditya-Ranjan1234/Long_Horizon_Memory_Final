@@ -1,0 +1,19 @@
+{
+  "n_episodes": 2,
+  "seed": 20260427,
+  "max_new_tokens": 32,
+  "batch_size": 2,
+  "batch_size_7b": 2,
+  "episodes_file": "episodes_grpo_long.json",
+  "capacity": 16,
+  "skip_models": [
+    "base_7b"
+  ],
+  "only_models": [],
+  "output_root": "C:\\Users\\dipta\\Downloads\\projects\\meta_pytorch_challenge\\Long_Horizon_Memory\\benchmark_results",
+  "run_id": "run_20260426_091458",
+  "episode_ids": [
+    146,
+    355
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "model": "grpo_1.5b",
+  "n_episodes": 20,
+  "n_steps": 1768,
+  "parse_rate": 0.994343891402715,
+  "parse_status": {
+    "ok": 1758,
+    "json_invalid": 5,
+    "pydantic_invalid": 5
+  },
+  "action_dist": {
+    "add": 0.2579185520361991,
+    "remove": 0.0022624434389140274,
+    "noop": 0.7398190045248869
+  },
+  "remove_correctness": 0.0,
+  "remove_correct_count": 0,
+  "remove_wrong_count": 4,
+  "env_errors": {
+    "memory_capacity_reached": 132
+  },
+  "mean_step_reward": 0.07382164404223111,
+  "median_step_reward": 0.05,
+  "mean_final_f1": 0.6416666666666666,
+  "median_final_f1": 0.6666666666666665,
+  "mean_final_precision": 0.721875,
+  "mean_final_recall": 0.5775,
+  "mean_max_memory_fill": 16.0,
+  "long_horizon_step_pct": 0.7115384615384616,
+  "memory_full_step_pct": 0.36934389140271495
+}

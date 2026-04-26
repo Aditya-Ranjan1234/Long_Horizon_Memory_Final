@@ -1,0 +1,47 @@
+{
+  "parse_failure_examples": {},
+  "env_error_examples": {
+    "memory_capacity_reached": [
+      {
+        "episode_id": 146,
+        "step": 17,
+        "operation_applied": "add",
+        "remove_index": null,
+        "memory_fill": 16,
+        "completion_text": "{\"operation\":\"add\"}"
+      },
+      {
+        "episode_id": 355,
+        "step": 17,
+        "operation_applied": "add",
+        "remove_index": null,
+        "memory_fill": 16,
+        "completion_text": "assistant\n{\"operation\":\"add\"}"
+      },
+      {
+        "episode_id": 326,
+        "step": 17,
+        "operation_applied": "add",
+        "remove_index": null,
+        "memory_fill": 16,
+        "completion_text": "assistant\n{\"operation\":\"add\"}"
+      },
+      {
+        "episode_id": 247,
+        "step": 17,
+        "operation_applied": "add",
+        "remove_index": null,
+        "memory_fill": 16,
+        "completion_text": " am trying a new espresso blend with a fruity finish.\n\nDecide one action now.\nassistant\n{\"operation\":\"add\"}"
+      },
+      {
+        "episode_id": 193,
+        "step": 17,
+        "operation_applied": "add",
+        "remove_index": null,
+        "memory_fill": 16,
+        "completion_text": "\n{\"operation\":\"add\"}"
+      }
+    ]
+  }
+}
