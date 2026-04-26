@@ -11,6 +11,12 @@ from openai import OpenAI
 
 load_dotenv()
 
+# Ensure we can import from root
+import sys
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 try:
     from models import LongHorizonMemoryAction, LongHorizonMemoryObservation
     from server.long_horizon_memory_environment import LongHorizonMemoryEnvironment
@@ -22,11 +28,12 @@ except (ImportError, ModuleNotFoundError):
         from long_horizon_memory.models import LongHorizonMemoryAction, LongHorizonMemoryObservation
         from long_horizon_memory.server.long_horizon_memory_environment import LongHorizonMemoryEnvironment
 
+import requests
+
 HF_TOKEN = os.getenv("HF_TOKEN")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
-# Optional — if you use from_docker_image():
-LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
+HF_SPACE_URL = os.getenv("HF_SPACE_URL", "https://aditya-ranjan1234-long-horizon-memory-env-final.hf.space")
 
 BENCHMARK = os.getenv("MY_ENV_BENCHMARK", "long_horizon_memory")
 MAX_STEPS = int(os.getenv("MAX_STEPS", "20"))
@@ -76,8 +83,24 @@ OR
 Think carefully about each decision based on the scoring formula."""
 
 
-def log_start(task: str, env: str, model: str) -> None:
-    print(f"[START] task={task} env={env} model={model}", flush=True)
+def check_hf_status() -> None:
+    print(f"[CHECK] Verifying Hugging Face Space: {HF_SPACE_URL}", flush=True)
+    try:
+        resp = requests.get(f"{HF_SPACE_URL}/health", timeout=10)
+        if resp.status_code == 200:
+            print(f"[OK] Hugging Face Space is LIVE and healthy.", flush=True)
+        else:
+            print(f"[WARNING] Hugging Face Space returned status {resp.status_code}", flush=True)
+    except Exception as e:
+        print(f"[ERROR] Could not connect to Hugging Face Space: {e}", flush=True)
+
+
+def log_start(task: str, env: str, model: str, metadata: Optional[dict] = None) -> None:
+    header = f"[START] task={task} env={env} model={model}"
+    if metadata:
+        params = {k: v for k, v in metadata.items() if k in ["memory_capacity", "task", "episode_id"]}
+        header += f" | parameters={params}"
+    print(header, flush=True)
 
 
 def log_step(
@@ -271,7 +294,7 @@ def run_task(task_name: str, llm: OpenAI) -> Tuple[bool, List[float]]:
     env = LongHorizonMemoryEnvironment()
 
     observation = env.reset()
-    log_start(task_name, BENCHMARK, MODEL_NAME)
+    log_start(task_name, BENCHMARK, MODEL_NAME, observation.metadata)
 
     rewards: List[float] = []
     success = False
@@ -314,6 +337,8 @@ def run_task(task_name: str, llm: OpenAI) -> Tuple[bool, List[float]]:
 
 
 def main() -> None:
+    check_hf_status()
+
     if not HF_TOKEN:
         raise ValueError("HF_TOKEN must be set for inference.")
 
@@ -356,7 +381,7 @@ def main() -> None:
 
             env = LongHorizonMemoryEnvironment()
             observation = env.reset()
-            log_start("all", BENCHMARK, MODEL_NAME)
+            log_start("all", BENCHMARK, MODEL_NAME, observation.metadata)
 
             rewards: List[float] = []
             success = False

@@ -14,7 +14,7 @@ version = "0.1.0"
 description = "Long Horizon Memory environment for OpenEnv"
 requires-python = ">=3.10"
 dependencies = [
-    "openenv-core[core,web]>=0.2.3",
+    "openenv-core>=0.2.3",
     "openai>=1.30.0",
     "jinja2",
     "aiofiles",
@@ -31,8 +31,8 @@ dev = [
 # Server entry point - enables running via: uv run --project . server
 # or: python -m long_horizon_memory.server.app
 server = "server.app:main"
-random-baseline = "random_baseline:main"
-inference = "inference:main"
+random-baseline = "verification.random_baseline:main"
+inference = "verification.inference:main"
 
 [tool.setuptools]
 include-package-data = true
