@@ -31,15 +31,22 @@ jobs:
           # Use a shallow clone for speed, but ensure we have enough history
           git clone --depth 1 https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final hf-space
           
-          # Exclude .git, and other non-backend files
+          # Exclude .git, training checkpoints, and other non-backend files
           rsync -av --delete \
             --exclude='.git' \
             --exclude='.github/' \
             --exclude='README.md' \
+            --exclude='memory_action_sft_qwen15b/' \
+            --exclude='memory_action_grpo_qwen15b/' \
+            --exclude='benchmark_results/' \
+            --exclude='kaggle_benchmarking/' \
+            --exclude='venv/' \
+            --exclude='.venv/' \
             ./ hf-space/
 
           cd hf-space
           
           git add .
           git commit -m "Auto deploy from GitHub" || echo "No changes"
+          git config lfs.allowincompletepush true
           git push https://aditya-ranjan1234:$HF_TOKEN@huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final main
