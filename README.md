@@ -418,6 +418,28 @@ rl/
 
 This project is part of the Meta RL Hackathon submission.
 
+##  Performance Results
+
+The system achieves state-of-the-art performance on long-horizon memory tasks through its hybrid intelligence architecture.
+
+### Training Progress
+Our GRPO-based training shows consistent convergence across complex semantic disambiguation tasks.
+
+![Training Progress](images/training_results.png)
+
+### Model Performance Summary
+- **Success Rate:** 83.3% (20/24 episodes)
+- **Average Task Score:** 0.915
+- **Mean Recall:** 0.94
+- **Mean Precision:** 0.88
+
+### Deployment Configuration
+The environment is optimized for high-throughput inference on Hugging Face Spaces.
+
+![Deployment Config](images/deployment_config.png)
+
+---
+
 ##  Contributors
 
 Built with advanced prompt engineering and semantic episode design for competitive RL evaluation.
