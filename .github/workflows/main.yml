@@ -23,35 +23,42 @@ jobs:
       - name: Deploy to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         run: |
           git config --global user.email "aditya87331@gmail.com"
           git config --global user.name "Aditya-Ranjan1234"
 
-          # Use a shallow clone for speed, but ensure we have enough history
-          git clone --depth 1 https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final hf-space
+          # Clone the HF space
+          git clone https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final hf-space
           
-          # Exclude .git, training checkpoints, and other non-backend files
-          rsync -av --delete \
-            --exclude='.git' \
-            --exclude='.github/' \
-            --exclude='memory_action_sft_qwen15b/' \
-            --exclude='memory_action_grpo_qwen15b/' \
-            --exclude='benchmark_results/' \
-            --exclude='kaggle_benchmarking/' \
-            --exclude='venv/' \
-            --exclude='.venv/' \
-            --exclude='ui/' \
-            --exclude='verification/' \
-            --exclude='*.ipynb' \
-            --exclude='*.jsonl' \
-            --exclude='*.pt' \
-            --exclude='*.bin' \
-            --exclude='*.safetensors' \
-            ./ hf-space/
+          # Clean hf-space except .git
+          find hf-space -maxdepth 1 -not -name 'hf-space' -not -name '.git' -exec rm -rf {} +
+          
+          # Copy only required files/folders
+          echo "Copying application files..."
+          cp -r server hf-space/
+          cp -r images hf-space/
+          cp -r dashboard_dist hf-space/
+          cp -r verification hf-space/
+          cp app.py hf-space/ || true
+          cp models.py hf-space/ || true
+          cp README.md hf-space/ || true
+          cp pyproject.toml hf-space/ || true
+          cp uv.lock hf-space/ || true
+          cp Dockerfile hf-space/ || true
+          cp .gitignore hf-space/ || true
+          cp *.txt hf-space/ || true
 
           cd hf-space
           
+          # Final safety check: remove any accidentally copied large directories
+          rm -rf memory_action_sft_qwen15b memory_action_grpo_qwen15b .venv venv
+          
+          echo "Deployment size:"
+          du -sh .
+          
           git add .
-          git commit -m "Auto deploy from GitHub: Professional Structure & Visuals" || echo "No changes"
+          echo "Git Status:"
+          git status
+          
+          git commit -m "Auto deploy from GitHub: Clean professional build" || echo "No changes"
           git push https://aditya-ranjan1234:$HF_TOKEN@huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final main

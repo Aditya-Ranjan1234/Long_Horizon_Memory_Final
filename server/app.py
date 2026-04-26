@@ -67,6 +67,7 @@ class ConnectionManager:
         self.worker_task = None
 
     async def broadcast_worker(self):
+        print("[SERVER] ConnectionManager v2.0 initialized.")
         print("[SERVER] Broadcast worker started.")
         while True:
             try:
