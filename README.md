@@ -52,6 +52,20 @@ Analysis of the [📜 GRPO Training Log](https://github.com/Aditya-Ranjan1234/Lo
 #### ⚖️ Reward Signal: Accuracy & Precision Deep Dive
 The environment uses a **Shaped Reward Signal** designed to break "noop-collapse" (where models learn to do nothing to avoid penalties).
 
+**The Core Formula (Terminal Evaluation):**
+At the end of each episode, the model is judged by a composite success metric:
+$$task\_score = 0.6 \times recall + 0.4 \times precision - 0.25 \times incorrect\_rate - 0.15 \times overflow\_rate$$
+
+| Component | Weight/Penalty | Purpose |
+| :--- | :--- | :--- |
+| **Recall** | `0.60` (Highest) | Ensures relevant items are actually captured. |
+| **Precision** | `0.40` | Ensures stored items are actually relevant. |
+| **Incorrect Rate** | `-0.25` | Penalizes memory slots wasted on noise. |
+| **Overflow Rate** | `-0.15` | Penalizes exceeding the 8-slot capacity. |
+
+**Per-Step Shaped Reward (Training Signal):**
+During training, immediate feedback is provided to guide the policy:
+
 | Action | State | Reward | Logic |
 | :--- | :--- | :--- | :--- |
 | **Add** | Relevant Message | `+0.60` | High incentive for capturing facts. |
@@ -60,12 +74,6 @@ The environment uses a **Shaped Reward Signal** designed to break "noop-collapse
 | **Remove** | Relevant Item | `-0.50` | Penalty for losing historical context (Recall). |
 | **Noop** | Relevant Message | `-0.30` | Penalty for missing information (Omission). |
 | **Noop** | Irrelevant Noise | `+0.05` | Minor reward for filtering out noise. |
-
-**Terminal Bonus (The Judge's Metric):**
-At the end of each episode, a bonus of **0.5 × F1-Score** is applied. 
-- **Precision-Based Reward**: `Correct_Kept / Total_Kept`. Penalizes agents that fill memory with junk.
-- **Recall-Based Reward**: `Correct_Kept / Total_Relevant_Seen`. Penalizes agents that ignore key facts.
-- **F1-Score**: The harmonic mean ensures the agent must balance both accuracy in selection and diligence in retention.
 
 ---
 

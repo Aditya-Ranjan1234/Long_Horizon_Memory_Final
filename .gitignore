@@ -22,6 +22,8 @@ wheels/
 MANIFEST
 
 # Virtual environments
+.env
+verification/.env
 .venv/
 venv/
 ENV/
