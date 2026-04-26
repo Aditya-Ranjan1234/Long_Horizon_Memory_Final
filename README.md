@@ -52,15 +52,21 @@ The policy is optimized using a multi-objective reward function:
 
 The following results demonstrate the agent's ability to maintain high precision even as the memory buffer fills up.
 
-### Training Progress
-![Training Reward](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/training_results.png)
+### Precision & Recall
+![Precision Recall](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/precision_recall.png)
 
-### Action Selection
+### F1-Score Evolution
+![F1 Scores](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/f1_scores.png)
+
+### Action Frequencies
 The agent learns a balanced distribution of `add` and `remove` operations, moving away from a "noop-only" collapse.
 ![Action Distribution](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/action_distribution.png)
 
-### Final Performance Metrics
-![Benchmark Results](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_results.png)
+### Training Reward Evolution
+![Training Results](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/training_results.png)
+
+### Benchmark Summary
+![Benchmark Table](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_table.png)
 
 ---
 
