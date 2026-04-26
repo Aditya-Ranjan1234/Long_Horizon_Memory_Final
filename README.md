@@ -39,6 +39,8 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 ### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
 Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance. Unlike traditional PPO, GRPO samples a group of completions for the same prompt and calculates the advantage relative to the group mean, significantly reducing memory overhead.
 
+![GRPO Training Step Example](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_step_example.png)
+
 #### 🧠 Training Methodology (Log Analysis)
 Analysis of the [📜 GRPO Training Log](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt) reveals key architectural strategies:
 - **Active Exploration via Logit-Biasing**: The training engine applies a **+3.5 bias** to tokens associated with the `remove` operation. This forces the model to explore buffer cleaning strategies rather than defaulting to a safe "noop" state.
