@@ -144,8 +144,10 @@ if not os.path.exists(ui_dist_path):
 
 if os.path.exists(ui_dist_path):
     print(f"[SERVER] Mounting custom UI from {ui_dist_path}")
-    # Clear default /web
-    app.routes = [r for r in app.routes if getattr(r, "path", None) != "/web"]
+    # Clear default /web route by mutating the router's routes list
+    new_routes = [r for r in app.router.routes if getattr(r, "path", None) != "/web"]
+    app.router.routes.clear()
+    app.router.routes.extend(new_routes)
     app.mount("/web", StaticFiles(directory=ui_dist_path, html=True), name="custom_web")
 else:
     print(f"[SERVER] No custom UI found at {ui_dist_path}, using default.")
