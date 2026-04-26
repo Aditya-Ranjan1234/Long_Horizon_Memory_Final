@@ -90,14 +90,17 @@ During training, immediate feedback is provided to guide the policy:
 
 The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
-### Performance Comparison
-![Benchmark Metrics](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_metrics.png)
+### Mean Reward Per Step
+![Mean Reward Per Step Comparison](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/reward_per_step.jpg)
 
-### Action Selection Evolution
-![Action Distribution Comparison](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/action_distribution_comparison.png)
+### Cumulative Reward Over Episode
+![Cumulative Reward Over Episode Steps](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/reward_accumulation.jpg)
 
-### Benchmark Summary Data
-![Benchmark Summary](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/benchmark_summary.png)
+### Precision Versus Recall Tradeoff
+![Model Precision Versus Recall Tradeoff](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/precision_vs_recall.png)
+
+### F1 Heatmap Across Episodes
+![F1 Heatmap by Model Episode](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/f1_heatmap.jpg)
 
 ---
 
