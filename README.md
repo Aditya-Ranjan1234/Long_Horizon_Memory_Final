@@ -37,20 +37,33 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 ![SFT Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_training_log.jpg)
 
 ### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
-Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance.
+Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance. Unlike traditional PPO, GRPO samples a group of completions for the same prompt and calculates the advantage relative to the group mean, significantly reducing memory overhead.
 
-![GRPO Loss Curve](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_loss_curve.png)
-*GRPO Training Log Reference:*
-![GRPO Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_training_log.png)
+#### 🧠 Training Methodology (Log Analysis)
+Analysis of the [📜 GRPO Training Log](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt) reveals key architectural strategies:
+- **Active Exploration via Logit-Biasing**: The training engine applies a **+3.5 bias** to tokens associated with the `remove` operation. This forces the model to explore buffer cleaning strategies rather than defaulting to a safe "noop" state.
+- **Style-Curated Curriculum**: Training data is mixed with specific scenarios:
+  - `remove_friendly`: Scenarios where the buffer is nearly full and low-value items must be evicted.
+  - `fill_first`: Scenarios focused on early-episode identification of relevant data.
+- **Adapter-Based Training**: Uses a LoRA adapter (Rank 8-16) to specialize the **Qwen2.5-1.5B** backbone for JSON-structured environment interaction.
 
-#### ⚖️ Reward Function Logic
-The policy is optimized using a multi-objective reward function:
-- **Task Reward**: Based on the environment state (`task_score`).
-  - Correct Add: `+0.6`
-  - Correct Remove: `+0.4`
-  - Correct Noop: `+0.05`
-  - Errors: `-0.5` to `-1.0`
-- **Format Reward**: `+0.05` for valid, parseable JSON output.
+#### ⚖️ Reward Signal: Accuracy & Precision Deep Dive
+The environment uses a **Shaped Reward Signal** designed to break "noop-collapse" (where models learn to do nothing to avoid penalties).
+
+| Action | State | Reward | Logic |
+| :--- | :--- | :--- | :--- |
+| **Add** | Relevant Message | `+0.60` | High incentive for capturing facts. |
+| **Add** | Irrelevant Noise | `-0.60` | Heavy penalty for memory pollution. |
+| **Remove** | Irrelevant Item | `+0.40` | Reward for active buffer maintenance (Precision). |
+| **Remove** | Relevant Item | `-0.50` | Penalty for losing historical context (Recall). |
+| **Noop** | Relevant Message | `-0.30` | Penalty for missing information (Omission). |
+| **Noop** | Irrelevant Noise | `+0.05` | Minor reward for filtering out noise. |
+
+**Terminal Bonus (The Judge's Metric):**
+At the end of each episode, a bonus of **0.5 × F1-Score** is applied. 
+- **Precision-Based Reward**: `Correct_Kept / Total_Kept`. Penalizes agents that fill memory with junk.
+- **Recall-Based Reward**: `Correct_Kept / Total_Relevant_Seen`. Penalizes agents that ignore key facts.
+- **F1-Score**: The harmonic mean ensures the agent must balance both accuracy in selection and diligence in retention.
 
 ---
 
