@@ -447,11 +447,6 @@ Our optimized GRPO policy significantly outperforms the base model and SFT basel
 
 ![Benchmark Table](images/benchmark_table.png)
 
-### Deployment Configuration
-The environment is optimized for high-throughput inference on Hugging Face Spaces.
-
-![Deployment Config](images/deployment_config.png)
-
 ---
 
 ##  Contributors

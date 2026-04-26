@@ -42,6 +42,11 @@ jobs:
             --exclude='venv/' \
             --exclude='.venv/' \
             --exclude='ui/' \
+            --exclude='*.ipynb' \
+            --exclude='*.jsonl' \
+            --exclude='*.pt' \
+            --exclude='*.bin' \
+            --exclude='*.safetensors' \
             ./ hf-space/
 
           cd hf-space
