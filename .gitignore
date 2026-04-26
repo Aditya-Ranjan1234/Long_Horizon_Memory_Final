@@ -66,6 +66,15 @@ coverage.xml
 # Docker
 *.dockerignore
 
+# Model Weights & Large Logs
+memory_action_sft_qwen15b/
+memory_action_grpo_qwen15b/
+*.pt
+*.bin
+*.safetensors
+*.jsonl
+*.csv
+
 # Temporary files
 *.tmp
 *.bak

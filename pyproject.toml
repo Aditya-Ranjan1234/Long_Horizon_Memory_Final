@@ -31,8 +31,8 @@ dev = [
 # Server entry point - enables running via: uv run --project . server
 # or: python -m long_horizon_memory.server.app
 server = "server.app:main"
-random-baseline = "random_baseline:main"
-inference = "inference:main"
+random-baseline = "verification.random_baseline:main"
+inference = "verification.inference:main"
 
 [tool.setuptools]
 include-package-data = true
