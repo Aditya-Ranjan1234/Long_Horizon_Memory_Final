@@ -162,17 +162,17 @@ function App() {
         <div className="flex flex-col">
           <span className="text-[#646669] text-sm">precision</span>
           <span className="text-2xl text-[#e2b714]">
-            {agentState?.memory_count 
+            {(agentState?.step && agentState.memory_count) 
               ? ((agentState.correct_in_memory / agentState.memory_count) * 100).toFixed(0) 
-              : 100}%
+              : 0}%
           </span>
         </div>
         <div className="flex flex-col">
           <span className="text-[#646669] text-sm">recall</span>
           <span className="text-2xl text-[#3b82f6]">
-            {agentState?.total_relevant_seen 
+            {(agentState?.step && agentState.total_relevant_seen) 
               ? ((agentState.correct_in_memory / agentState.total_relevant_seen) * 100).toFixed(0) 
-              : 100}%
+              : 0}%
           </span>
         </div>
         <div className="flex flex-col">
