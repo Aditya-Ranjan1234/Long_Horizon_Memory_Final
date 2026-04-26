@@ -41,14 +41,24 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 - **Method**: LoRA (4-bit quantization)
 - **Data**: ~175 samples of perfect memory management.
 
+<div align="center">
+
 ![SFT Loss Curve](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_loss_curve.png)
+<br>
 *SFT Training Log Reference:*
+<br>
 ![SFT Training Log](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/sft_training_log.jpg)
+
+</div>
 
 ### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
 Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance. Unlike traditional PPO, GRPO samples a group of completions for the same prompt and calculates the advantage relative to the group mean, significantly reducing memory overhead.
 
+<div align="center">
+
 ![GRPO Training Step Example](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/grpo_step_example.png)
+
+</div>
 
 #### 🧠 Training Methodology (Log Analysis)
 Analysis of the [📜 GRPO Training Log](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt) reveals key architectural strategies:
@@ -91,16 +101,32 @@ During training, immediate feedback is provided to guide the policy:
 The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
 ### Mean Reward Per Step
+<div align="center">
+
 ![Mean Reward Per Step Comparison](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/reward_per_step.jpg)
 
+</div>
+
 ### Cumulative Reward Over Episode
+<div align="center">
+
 ![Cumulative Reward Over Episode Steps](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/reward_accumulation.jpg)
 
+</div>
+
 ### Precision Versus Recall Tradeoff
+<div align="center">
+
 ![Model Precision Versus Recall Tradeoff](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/precision_vs_recall.png)
 
+</div>
+
 ### F1 Heatmap Across Episodes
+<div align="center">
+
 ![F1 Heatmap by Model Episode](https://raw.githubusercontent.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/main/images/f1_heatmap.jpg)
+
+</div>
 
 ---
 
