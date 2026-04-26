@@ -22,15 +22,14 @@ jobs:
           git config --global user.email "aditya87331@gmail.com"
           git config --global user.name "Aditya-Ranjan1234"
 
-          # Clone the HF space
-          git clone https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final hf-space
+          # Clone the HF space OUTSIDE the current directory to avoid rsync recursion
+          git clone https://huggingface.co/spaces/aditya-ranjan1234/long-horizon-memory-env-final ../hf-space
           
           # Sync everything EXCEPT images, large model dirs, and source ui
-          # We exclude images/ because the README on HF uses GitHub Raw links.
-          # This avoids HF's strict binary file rejection policy.
           rsync -av --delete \
             --exclude='.git' \
             --exclude='.github/' \
+            --exclude='hf-space/' \
             --exclude='images/' \
             --exclude='ui/' \
             --exclude='memory_action_sft_qwen15b/' \
@@ -40,9 +39,9 @@ jobs:
             --exclude='*.pt' \
             --exclude='*.bin' \
             --exclude='*.safetensors' \
-            ./ hf-space/
+            ./ ../hf-space/
 
-          cd hf-space
+          cd ../hf-space
           
           echo "Deployment size:"
           du -sh .
