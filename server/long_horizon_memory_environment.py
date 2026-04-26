@@ -277,10 +277,17 @@ class LongHorizonMemoryEnvironment(Environment):
         hf_space_url = "https://aditya-ranjan1234-long-horizon-memory-env-final.hf.space"
         def _post():
             try:
-                import requests
+                import json
+                import urllib.request
                 data = obs.model_dump() if hasattr(obs, "model_dump") else obs.dict()
                 data["operation"] = action_op
-                requests.post(f"{hf_space_url}/telemetry", json=data, timeout=2)
+                req = urllib.request.Request(
+                    f"{hf_space_url}/telemetry", 
+                    data=json.dumps(data).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST"
+                )
+                urllib.request.urlopen(req, timeout=2.0)
             except Exception:
                 pass
                 
