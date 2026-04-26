@@ -1,6 +1,5 @@
 ---
 title: Long Horizon Memory Final
-emoji: 🚀
 colorFrom: yellow
 colorTo: gray
 sdk: docker
@@ -17,11 +16,11 @@ A professional-grade Reinforcement Learning environment and training pipeline fo
 
 ---
 
-## 🏗️ Architecture & Environment
+## Architecture & Environment
 
 The environment simulates a high-pressure memory management task where an agent must decide which information to keep, add, or discard from a fixed-capacity buffer.
 
-### 🎮 The Environment Mechanics
+### The Environment Mechanics
 - **Capacity**: Configurable (default: 8 or 16 slots).
 - **Operations**:
   - `add`: Add the current message to memory.
@@ -31,11 +30,11 @@ The environment simulates a high-pressure memory management task where an agent 
 
 ---
 
-## 🚀 Training Pipeline
+## Training Pipeline
 
 We follow a two-stage training process to transform a base LLM (**Qwen2.5-1.5B-Instruct**) into a specialized memory manager.
 
-### 1️⃣ Phase 1: Supervised Fine-Tuning (SFT)
+### Phase 1: Supervised Fine-Tuning (SFT)
 The model is trained on a "Seed Dataset" of perfect memory operations. This teaches the model the basic JSON schema and the semantic difference between relevant and irrelevant messages.
 - **Base Model**: Qwen2.5-1.5B-Instruct
 - **Method**: LoRA (4-bit quantization)
@@ -51,7 +50,7 @@ The model is trained on a "Seed Dataset" of perfect memory operations. This teac
 
 </div>
 
-### 2️⃣ Phase 2: Group Relative Policy Optimization (GRPO)
+### Phase 2: Group Relative Policy Optimization (GRPO)
 Using the SFT model as a starting point, we apply GRPO to optimize for long-horizon performance. Unlike traditional PPO, GRPO samples a group of completions for the same prompt and calculates the advantage relative to the group mean, significantly reducing memory overhead.
 
 <div align="center">
@@ -60,15 +59,15 @@ Using the SFT model as a starting point, we apply GRPO to optimize for long-hori
 
 </div>
 
-#### 🧠 Training Methodology (Log Analysis)
-Analysis of the [📜 GRPO Training Log](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt) reveals key architectural strategies:
+#### Training Methodology (Log Analysis)
+Analysis of the [GRPO Training Log](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt) reveals key architectural strategies:
 - **Active Exploration via Logit-Biasing**: The training engine applies a **+3.5 bias** to tokens associated with the `remove` operation. This forces the model to explore buffer cleaning strategies rather than defaulting to a safe "noop" state.
 - **Style-Curated Curriculum**: Training data is mixed with specific scenarios:
   - `remove_friendly`: Scenarios where the buffer is nearly full and low-value items must be evicted.
   - `fill_first`: Scenarios focused on early-episode identification of relevant data.
 - **Adapter-Based Training**: Uses a LoRA adapter (Rank 8-16) to specialize the **Qwen2.5-1.5B** backbone for JSON-structured environment interaction.
 
-#### ⚖️ Reward Signal: Accuracy & Precision Deep Dive
+#### Reward Signal: Accuracy & Precision Deep Dive
 The environment uses a **Shaped Reward Signal** designed to break "noop-collapse" (where models learn to do nothing to avoid penalties).
 
 **The Core Formula (Terminal Evaluation):**
@@ -96,7 +95,7 @@ During training, immediate feedback is provided to guide the policy:
 
 ---
 
-## 📊 Results & Benchmarks
+## Results & Benchmarks
 
 The following summary compares the base model, SFT model, and the final GRPO-tuned model across 20 episodes and 1768 steps.
 
@@ -130,15 +129,15 @@ The following summary compares the base model, SFT model, and the final GRPO-tun
 
 ---
 
-## 📂 Logs & Traceability
+## Logs & Traceability
 
 Detailed execution logs for both training phases are available for audit:
-- [📜 GRPO Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt)
-- [📜 SFT Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/SFT%20Training%20For%20JSON%20Format.txt)
+- [GRPO Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/GRPO%20Training%20Log.txt)
+- [SFT Training Full Log (Text)](https://github.com/Aditya-Ranjan1234/Long_Horizon_Memory_Final/blob/main/SFT%20Training%20For%20JSON%20Format.txt)
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 .
@@ -153,7 +152,7 @@ Detailed execution logs for both training phases are available for audit:
 
 ---
 
-## 🛠️ Verification
+## Verification
 To verify the environment paths and WebSocket connectivity:
 ```powershell
 python verification/verify_env_paths.py
@@ -161,7 +160,7 @@ python verification/verify_env_paths.py
 
 ---
 
-## 🌍 Real-World Applications
+## Real-World Applications
 
 As the **AI Agents Boom** accelerates, managing extended context windows becomes a critical bottleneck. Long Horizon Memory solves real-world challenges where **token scarcity** and **inference costs** prohibit feeding massive, unbounded logs into LLMs.
 
